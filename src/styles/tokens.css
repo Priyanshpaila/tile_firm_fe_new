@@ -1,0 +1,17 @@
+:root {
+  --background: #f7f2ea;
+  --background-alt: #f0e6d6;
+  --surface: #fffaf2;
+  --surface-alt: #efe1ce;
+  --text-primary: #2f2418;
+  --text-secondary: #7d6855;
+  --accent-primary: #8b5e34;
+  --accent-secondary: #c79f6b;
+  --border-soft: rgba(80, 55, 30, 0.14);
+  --button-primary: #8b5e34;
+  --button-primary-hover: #6f4c2c;
+  --success: #2e7d32;
+  --danger: #c62828;
+  --ring: rgba(139, 94, 52, 0.22);
+  --max-width: 1200px;
+}
