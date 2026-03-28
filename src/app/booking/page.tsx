@@ -51,7 +51,7 @@ export default function BookingPage() {
             <input placeholder="State" value={form.state} onChange={(e) => setForm((p) => ({ ...p, state: e.target.value }))} required />
             <input placeholder="Pincode" value={form.pincode} onChange={(e) => setForm((p) => ({ ...p, pincode: e.target.value }))} required />
             <input type="date" value={form.date} onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))} required />
-            <select value={form.timeSlot} onChange={(e) => setForm((p) => ({ ...p, timeSlot: e.target.value }))}>{TIME_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}</select>
+            <select value={form.timeSlot} onChange={(e) => setForm((p) => ({ ...p, timeSlot: e.target.value as typeof form.timeSlot }))}>{TIME_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}</select>
             <select value={form.paymentMethod} onChange={(e) => setForm((p) => ({ ...p, paymentMethod: e.target.value as "cash" | "online" }))}><option value="cash">Cash</option><option value="online">Online</option></select>
           </div>
           <textarea placeholder="Notes" rows={4} value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} />

@@ -1,49 +1,137 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AuthGuard } from "@/components/layout/auth-guard";
 import { PageShell } from "@/components/layout/page-shell";
-import { StatsGrid } from "@/components/dashboard/stats-grid";
-import { Loader } from "@/components/ui/loader";
-import { api } from "@/lib/api";
-import { toDateLabel } from "@/lib/utils";
-import type { AdminStats, User } from "@/types";
+import { AdminTabs } from "./_components/admin-tabs";
+import { AdminOverviewTab } from "./_components/admin-overview-tab";
+import { AdminProductsTab } from "./_components/admin-products-tab";
+import { AdminCategoriesTab } from "./_components/admin-categories-tab";
+import { AdminStaffTab } from "./_components/admin-staff-tab";
+import { AdminUsersTab } from "./_components/admin-users-tab";
+import { ProductModal } from "./_components/product-modal";
+import { CategoryModal } from "./_components/category-modal";
+import { StaffModal } from "./_components/staff-modal";
+import { useAdminDashboard } from "./_hooks/use-admin-dashboard";
 
 export default function AdminPage() {
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      try {
-        const [statsRes, usersRes] = await Promise.all([api.admin.stats(), api.users.listUsers({ page: 1, limit: 8 })]);
-        setStats(statsRes.data.stats);
-        setUsers(usersRes.data.users);
-      } finally { setLoading(false); }
-    };
-    void run();
-  }, []);
+  const admin = useAdminDashboard();
 
   return (
     <AuthGuard roles={["admin"]}>
-      <PageShell title="Admin Dashboard" description="Uses admin-only backend routes for aggregate metrics and user management scaffolding.">
-        {loading || !stats ? <Loader label="Loading admin data..." /> : (
-          <div className="grid gap-6">
-            <StatsGrid items={[{ label: "Total users", value: stats.totalUsers }, { label: "Total products", value: stats.totalProducts }, { label: "Total appointments", value: stats.totalAppointments }, { label: "Total uploads", value: stats.totalUploads }]} />
-            <div className="grid gap-6 xl:grid-cols-2">
-              <div className="card-surface p-5">
-                <h2 className="text-xl font-semibold">Recent appointments</h2>
-                <div className="mt-4 grid gap-3">{stats.recentAppointments.map((appointment) => <div key={appointment._id} className="rounded-2xl border border-[var(--border-soft)] bg-white/60 p-4"><p className="font-semibold">{appointment.ticketNumber}</p><p className="text-sm text-[var(--text-secondary)]">{appointment.user?.name || "Unknown user"} · {toDateLabel(appointment.date)} · {appointment.status}</p></div>)}</div>
-              </div>
-              <div className="card-surface p-5">
-                <h2 className="text-xl font-semibold">Recent users</h2>
-                <div className="mt-4 grid gap-3">{users.map((user) => <div key={user._id} className="rounded-2xl border border-[var(--border-soft)] bg-white/60 p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{user.name}</p><p className="text-sm text-[var(--text-secondary)]">{user.email}</p></div><span className="rounded-full bg-[var(--surface-alt)] px-3 py-1 text-xs">{user.role}</span></div></div>)}</div>
-              </div>
-            </div>
-          </div>
-        )}
+      <PageShell
+        title="Admin Dashboard"
+        description="Admin control panel with overview, products, categories, staff, and users."
+      >
+        <div className="grid gap-6">
+          <AdminTabs
+            activeTab={admin.activeTab}
+            onChange={admin.setActiveTab}
+          />
+
+          {admin.activeTab === "overview" ? (
+            <AdminOverviewTab
+              stats={admin.stats}
+              statsItems={admin.statsItems}
+              loading={admin.loadingDashboard}
+              error={admin.dashboardError}
+            />
+          ) : null}
+
+          {admin.activeTab === "products" ? (
+            <AdminProductsTab
+              products={admin.products}
+              categories={admin.categories}
+              loading={admin.loadingProducts}
+              error={admin.productsError}
+              productSearch={admin.productSearch}
+              setProductSearch={admin.setProductSearch}
+              productCategoryFilter={admin.productCategoryFilter}
+              setProductCategoryFilter={admin.setProductCategoryFilter}
+              productStockFilter={admin.productStockFilter}
+              setProductStockFilter={admin.setProductStockFilter}
+              productFeaturedFilter={admin.productFeaturedFilter}
+              setProductFeaturedFilter={admin.setProductFeaturedFilter}
+              productPage={admin.productPage}
+              productsPagination={admin.productsPagination}
+              onRefresh={() => void admin.loadProducts(1)}
+              onApplyFilters={() => void admin.loadProducts(1)}
+              onResetFilters={admin.resetProductFilters}
+              onCreateProduct={admin.openCreateModal}
+              onEditProduct={admin.openEditModal}
+              onDeleteProduct={(product) => void admin.handleDeleteProduct(product)}
+              onPrevPage={() => void admin.loadProducts(admin.productPage - 1)}
+              onNextPage={() => void admin.loadProducts(admin.productPage + 1)}
+            />
+          ) : null}
+
+          {admin.activeTab === "categories" ? (
+            <AdminCategoriesTab
+              categories={admin.categories}
+              loading={admin.loadingCategories}
+              error={admin.categoriesError}
+              onRefresh={() => void admin.loadCategories()}
+              onCreateCategory={admin.openCreateCategoryModal}
+              onEditCategory={admin.openEditCategoryModal}
+              onDeleteCategory={(category) =>
+                void admin.handleDeleteCategory(category)
+              }
+            />
+          ) : null}
+
+          {admin.activeTab === "staff" ? (
+            <AdminStaffTab
+              staffList={admin.staffList}
+              loading={admin.loadingStaff}
+              error={admin.staffError}
+              onRefresh={() => void admin.loadStaff()}
+              onCreateStaff={admin.openCreateStaffModal}
+              onEditStaff={admin.openEditStaffModal}
+            />
+          ) : null}
+
+          {admin.activeTab === "users" ? (
+            <AdminUsersTab
+              users={admin.users}
+              loading={admin.loadingUsers}
+              error={admin.usersError}
+              onToggleUser={(userId) => void admin.handleToggleUser(userId)}
+            />
+          ) : null}
+        </div>
+
+        <ProductModal
+          open={admin.modalOpen}
+          mode={admin.editingProduct ? "edit" : "create"}
+          form={admin.productForm}
+          setForm={admin.setProductForm}
+          categories={admin.categories}
+          saving={admin.savingProduct}
+          error={admin.productFormError}
+          onClose={admin.closeProductModal}
+          onSubmit={admin.handleSubmitProduct}
+        />
+
+        <CategoryModal
+          open={admin.categoryModalOpen}
+          mode={admin.editingCategory ? "edit" : "create"}
+          form={admin.categoryForm}
+          setForm={admin.setCategoryForm}
+          saving={admin.savingCategory}
+          error={admin.categoryFormError}
+          onClose={admin.closeCategoryModal}
+          onSubmit={admin.handleSubmitCategory}
+        />
+
+        <StaffModal
+          open={admin.staffModalOpen}
+          mode={admin.editingStaff ? "edit" : "create"}
+          form={admin.staffForm}
+          setForm={admin.setStaffForm}
+          saving={admin.savingStaff}
+          error={admin.staffFormError}
+          onClose={admin.closeStaffModal}
+          onSubmit={admin.handleSubmitStaff}
+        />
       </PageShell>
     </AuthGuard>
   );
