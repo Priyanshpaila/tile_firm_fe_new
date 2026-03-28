@@ -73,6 +73,10 @@ export function useAdminDashboard() {
   const [staffForm, setStaffForm] = useState<StaffFormState>(initialStaffForm);
   const [savingStaff, setSavingStaff] = useState(false);
   const [staffFormError, setStaffFormError] = useState("");
+  const [staffCredentialNotice, setStaffCredentialNotice] = useState<{
+    email: string;
+    temporaryPassword?: string;
+  } | null>(null);
 
   const [usersError, setUsersError] = useState("");
   const [productsError, setProductsError] = useState("");
@@ -86,14 +90,13 @@ export function useAdminDashboard() {
   const [productFeaturedFilter, setProductFeaturedFilter] = useState("");
   const [productPage, setProductPage] = useState(1);
 
-  const [productsPagination, setProductsPagination] = useState<ProductsPagination>(
-    {
+  const [productsPagination, setProductsPagination] =
+    useState<ProductsPagination>({
       page: 1,
       pages: 1,
       total: 0,
       limit: 8,
-    }
-  );
+    });
 
   const statsItems = useMemo(
     () =>
@@ -105,7 +108,7 @@ export function useAdminDashboard() {
             { label: "Total uploads", value: stats.totalUploads },
           ]
         : [],
-    [stats]
+    [stats],
   );
 
   const loadDashboard = async () => {
@@ -116,7 +119,9 @@ export function useAdminDashboard() {
       setStats(res.data.stats);
     } catch (error) {
       setDashboardError(
-        error instanceof Error ? error.message : "Failed to load dashboard stats."
+        error instanceof Error
+          ? error.message
+          : "Failed to load dashboard stats.",
       );
     } finally {
       setLoadingDashboard(false);
@@ -131,7 +136,7 @@ export function useAdminDashboard() {
       setUsers(res.data.users);
     } catch (error) {
       setUsersError(
-        error instanceof Error ? error.message : "Failed to load users."
+        error instanceof Error ? error.message : "Failed to load users.",
       );
     } finally {
       setLoadingUsers(false);
@@ -146,7 +151,7 @@ export function useAdminDashboard() {
       setCategories(res.data.categories);
     } catch (error) {
       setCategoriesError(
-        error instanceof Error ? error.message : "Failed to load categories."
+        error instanceof Error ? error.message : "Failed to load categories.",
       );
     } finally {
       setLoadingCategories(false);
@@ -161,7 +166,7 @@ export function useAdminDashboard() {
       setStaffList(res.data.staff);
     } catch (error) {
       setStaffError(
-        error instanceof Error ? error.message : "Failed to load staff."
+        error instanceof Error ? error.message : "Failed to load staff.",
       );
     } finally {
       setLoadingStaff(false);
@@ -189,7 +194,7 @@ export function useAdminDashboard() {
       setProductPage(res.pagination.page);
     } catch (error) {
       setProductsError(
-        error instanceof Error ? error.message : "Failed to load products."
+        error instanceof Error ? error.message : "Failed to load products.",
       );
     } finally {
       setLoadingProducts(false);
@@ -255,7 +260,7 @@ export function useAdminDashboard() {
       await Promise.all([loadProducts(productPage), loadDashboard()]);
     } catch (error) {
       setProductFormError(
-        error instanceof Error ? error.message : "Failed to save product."
+        error instanceof Error ? error.message : "Failed to save product.",
       );
     } finally {
       setSavingProduct(false);
@@ -271,7 +276,7 @@ export function useAdminDashboard() {
       await Promise.all([loadProducts(productPage), loadDashboard()]);
     } catch (error) {
       setProductsError(
-        error instanceof Error ? error.message : "Failed to delete product."
+        error instanceof Error ? error.message : "Failed to delete product.",
       );
     }
   };
@@ -324,7 +329,7 @@ export function useAdminDashboard() {
       await Promise.all([loadCategories(), loadProducts(1)]);
     } catch (error) {
       setCategoryFormError(
-        error instanceof Error ? error.message : "Failed to save category."
+        error instanceof Error ? error.message : "Failed to save category.",
       );
     } finally {
       setSavingCategory(false);
@@ -340,7 +345,7 @@ export function useAdminDashboard() {
       await Promise.all([loadCategories(), loadProducts(1)]);
     } catch (error) {
       setCategoriesError(
-        error instanceof Error ? error.message : "Failed to delete category."
+        error instanceof Error ? error.message : "Failed to delete category.",
       );
     }
   };
@@ -383,17 +388,26 @@ export function useAdminDashboard() {
     try {
       const payload = buildStaffPayload(staffForm);
 
-      if (editingStaff) {
-        await api.staff.update(editingStaff._id, payload);
-      } else {
-        await api.staff.create(payload);
-      }
+      const res = editingStaff
+        ? await api.staff.update(editingStaff._id, payload)
+        : await api.staff.create(payload);
+
+      const loginAccount = res.data.loginAccount;
+
+      setStaffCredentialNotice(
+        loginAccount?.email
+          ? {
+              email: loginAccount.email,
+              temporaryPassword: loginAccount.temporaryPassword,
+            }
+          : null,
+      );
 
       closeStaffModal();
       await loadStaff();
     } catch (error) {
       setStaffFormError(
-        error instanceof Error ? error.message : "Failed to save staff."
+        error instanceof Error ? error.message : "Failed to save staff.",
       );
     } finally {
       setSavingStaff(false);
@@ -406,7 +420,9 @@ export function useAdminDashboard() {
       await loadUsers();
     } catch (error) {
       setUsersError(
-        error instanceof Error ? error.message : "Failed to update user status."
+        error instanceof Error
+          ? error.message
+          : "Failed to update user status.",
       );
     }
   };
@@ -417,6 +433,10 @@ export function useAdminDashboard() {
     setProductStockFilter("");
     setProductFeaturedFilter("");
     void loadProducts(1);
+  };
+
+  const clearStaffCredentialNotice = () => {
+    setStaffCredentialNotice(null);
   };
 
   return {
@@ -455,6 +475,9 @@ export function useAdminDashboard() {
     setStaffForm,
     savingStaff,
     staffFormError,
+    staffCredentialNotice,
+    setStaffCredentialNotice,
+    clearStaffCredentialNotice,
 
     usersError,
     productsError,

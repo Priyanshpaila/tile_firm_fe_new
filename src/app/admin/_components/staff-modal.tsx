@@ -37,7 +37,7 @@ export function StaffModal({
                     {mode === "create" ? "Create staff member" : "Edit staff member"}
                   </h3>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                    Manage team members for consultation and appointment assignment.
+                    Create a staff profile and linked login account in one flow.
                   </p>
                 </div>
 
@@ -83,13 +83,48 @@ export function StaffModal({
                   </label>
 
                   <label className="grid gap-2 md:col-span-2">
-                    <span className="text-sm font-medium">Email</span>
+                    <span className="text-sm font-medium">Email *</span>
                     <input
                       value={form.email}
                       onChange={(e) =>
                         setForm((prev) => ({ ...prev, email: e.target.value }))
                       }
                       placeholder="e.g. aman@tilevista.com"
+                    />
+                  </label>
+
+                  <label className="grid gap-2 md:col-span-2">
+                    <span className="text-sm font-medium">
+                      Password {mode === "create" ? "(optional)" : "(leave blank to keep current)"}
+                    </span>
+                    <input
+                      type="text"
+                      value={form.password}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, password: e.target.value }))
+                      }
+                      placeholder={
+                        mode === "create"
+                          ? "Leave blank to auto-generate temporary password"
+                          : "Enter only if you want to replace login password"
+                      }
+                    />
+                  </label>
+
+                  <label className="grid gap-2 md:col-span-2">
+                    <span className="text-sm font-medium">
+                      Service Areas
+                    </span>
+                    <textarea
+                      rows={4}
+                      value={form.serviceAreasText}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          serviceAreasText: e.target.value,
+                        }))
+                      }
+                      placeholder={`492001\n492004\nShankar Nagar`}
                     />
                   </label>
 
@@ -124,7 +159,7 @@ export function StaffModal({
                   </label>
 
                   <div className="rounded-[1rem] border border-[var(--border-soft)] bg-[#faf7f2] px-4 py-3 text-sm text-[var(--text-secondary)]">
-                    Keep this enabled only for staff members who can currently receive new appointments.
+                    If password is left blank during creation, the backend can generate a temporary password for staff login.
                   </div>
                 </div>
               </div>

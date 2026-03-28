@@ -14,6 +14,17 @@ import type {
 } from "@/types";
 import { buildQuery } from "./utils";
 
+type StaffLoginAccount = {
+  email: string;
+  role: string;
+  temporaryPassword?: string;
+};
+
+type StaffMutationResponse = {
+  staff: Staff;
+  loginAccount?: StaffLoginAccount;
+};
+
 export const api = {
   auth: {
     register: (payload: { name: string; email: string; password: string; phone?: string }) =>
@@ -245,14 +256,33 @@ export const api = {
         `/staff?${buildQuery(params)}`
       ),
 
-    create: (payload: Record<string, unknown>) =>
-      apiRequest<ApiResponse<{ staff: Staff }>>("/staff", {
+    create: (payload: {
+      name: string;
+      phone: string;
+      email: string;
+      password?: string;
+      isAvailable?: boolean;
+      serviceAreas?: string[];
+      notes?: string;
+    }) =>
+      apiRequest<ApiResponse<StaffMutationResponse>>("/staff", {
         method: "POST",
         body: payload,
       }),
 
-    update: (id: string, payload: Record<string, unknown>) =>
-      apiRequest<ApiResponse<{ staff: Staff }>>(`/staff/${id}`, {
+    update: (
+      id: string,
+      payload: {
+        name?: string;
+        phone?: string;
+        email?: string;
+        password?: string;
+        isAvailable?: boolean;
+        serviceAreas?: string[];
+        notes?: string;
+      }
+    ) =>
+      apiRequest<ApiResponse<StaffMutationResponse>>(`/staff/${id}`, {
         method: "PATCH",
         body: payload,
       }),

@@ -58,7 +58,9 @@ export default function AdminPage() {
               onResetFilters={admin.resetProductFilters}
               onCreateProduct={admin.openCreateModal}
               onEditProduct={admin.openEditModal}
-              onDeleteProduct={(product) => void admin.handleDeleteProduct(product)}
+              onDeleteProduct={(product) =>
+                void admin.handleDeleteProduct(product)
+              }
               onPrevPage={() => void admin.loadProducts(admin.productPage - 1)}
               onNextPage={() => void admin.loadProducts(admin.productPage + 1)}
             />
@@ -86,6 +88,8 @@ export default function AdminPage() {
               onRefresh={() => void admin.loadStaff()}
               onCreateStaff={admin.openCreateStaffModal}
               onEditStaff={admin.openEditStaffModal}
+              staffCredentialNotice={admin.staffCredentialNotice}
+              onClearCredentialNotice={admin.clearStaffCredentialNotice}
             />
           ) : null}
 
