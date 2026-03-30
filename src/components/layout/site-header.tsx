@@ -120,7 +120,7 @@ export function SiteHeader() {
           ]
         : []),
     ],
-    [user]
+    [user],
   );
 
   const isActive = (href: string) => {
@@ -137,32 +137,35 @@ export function SiteHeader() {
     ? "text-white/82 hover:text-white"
     : "text-[#6f655b] hover:text-[#181512]";
 
-  const logoRingClass = overlayMode
-    ? "border-white/70"
-    : "border-[#181512]/70";
+  const logoRingClass = overlayMode ? "border-white/70" : "border-[#181512]/70";
 
   const iconButtonClass = cn(
     "inline-flex h-11 w-11 items-center justify-center rounded-full border transition",
     overlayMode
       ? "border-white/20 bg-white/6 text-white hover:bg-white/12"
-      : "border-black/10 bg-white/70 text-[#181512] hover:bg-white"
+      : "border-black/10 bg-white/70 text-[#181512] hover:bg-white",
   );
 
   const desktopPrimaryPillClass = cn(
     "hidden h-11 items-center rounded-full px-5 text-sm font-semibold md:inline-flex transition",
     overlayMode
       ? "border border-white/18 bg-white/10 text-white hover:bg-white/16"
-      : "bg-[#a9743c] text-white shadow-[0_10px_30px_rgba(169,116,60,0.20)] hover:bg-[#95632f]"
+      : "bg-[#a9743c] text-white shadow-[0_10px_30px_rgba(169,116,60,0.20)] hover:bg-[#95632f]",
+  );
+
+  const bookingPillClass = cn(
+    "hidden h-11 items-center rounded-full px-5 text-sm font-semibold transition lg:inline-flex",
+    overlayMode
+      ? "bg-[#a9743c] text-white shadow-[0_12px_30px_rgba(169,116,60,0.26)] hover:bg-[#95632f]"
+      : "bg-[#a9743c] text-white shadow-[0_10px_30px_rgba(169,116,60,0.20)] hover:bg-[#95632f]",
   );
 
   return (
-    <header
-      className={cn("inset-x-0 top-0 z-50", isHome ? "fixed" : "sticky")}
-    >
+    <header className={cn("inset-x-0 top-0 z-50", isHome ? "fixed" : "sticky")}>
       <div
         className={cn(
           "mx-auto mt-3 flex h-[68px] w-[calc(100%-1rem)] max-w-[1820px] items-center justify-between px-4 transition-all duration-300 md:w-[calc(100%-2.5rem)] md:px-6",
-          headerModeClass
+          headerModeClass,
         )}
       >
         <Link
@@ -173,13 +176,13 @@ export function SiteHeader() {
           <span
             className={cn(
               "relative flex h-9 w-9 items-center justify-center rounded-full border",
-              logoRingClass
+              logoRingClass,
             )}
           >
             <span
               className={cn(
                 "h-4 w-4 rounded-full border",
-                overlayMode ? "border-white/80" : "border-[#181512]/80"
+                overlayMode ? "border-white/80" : "border-[#181512]/80",
               )}
             />
           </span>
@@ -187,7 +190,7 @@ export function SiteHeader() {
           <span
             className={cn(
               "text-xl font-semibold tracking-[-0.05em]",
-              overlayMode ? "text-white" : "text-[#181512]"
+              overlayMode ? "text-white" : "text-[#181512]",
             )}
           >
             {APP_NAME}
@@ -203,7 +206,7 @@ export function SiteHeader() {
                 "text-sm font-medium transition-colors",
                 linkClass,
                 isActive(item.href) &&
-                  (overlayMode ? "text-white" : "text-[#181512]")
+                  (overlayMode ? "text-white" : "text-[#181512]"),
               )}
             >
               {item.label}
@@ -212,9 +215,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link href={ROUTES.booking} className={bookingPillClass}>
+            Book Consultation
+          </Link>
+
           {user ? (
             <>
-              <Link href={roleHome(user.role)} className={desktopPrimaryPillClass}>
+              <Link
+                href={roleHome(user.role)}
+                className={desktopPrimaryPillClass}
+              >
                 {user.role === "admin" ? "Admin" : "Dashboard"}
               </Link>
 
@@ -276,7 +286,7 @@ export function SiteHeader() {
           "fixed inset-x-0 top-0 z-40 h-screen bg-[rgba(245,240,232,0.96)] px-5 pb-6 pt-24 backdrop-blur-xl transition-all duration-300 xl:hidden",
           mobileOpen
             ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
+            : "pointer-events-none opacity-0",
         )}
       >
         <div className="mx-auto flex h-full max-w-xl flex-col justify-between">
@@ -287,7 +297,7 @@ export function SiteHeader() {
                 href={item.href}
                 className={cn(
                   "rounded-2xl px-4 py-4 text-lg font-medium text-[#1b1714] transition hover:bg-black/5",
-                  isActive(item.href) && "bg-black/5"
+                  isActive(item.href) && "bg-black/5",
                 )}
               >
                 {item.label}
@@ -296,6 +306,13 @@ export function SiteHeader() {
           </div>
 
           <div className="grid gap-3 pt-6">
+            <Link
+              href={ROUTES.booking}
+              className="inline-flex h-12 items-center justify-center rounded-full bg-[#a9743c] text-sm font-semibold text-white"
+            >
+              Book Consultation
+            </Link>
+
             {user ? (
               <>
                 <Link
@@ -326,7 +343,7 @@ export function SiteHeader() {
 
                 <Link
                   href={ROUTES.register}
-                  className="inline-flex h-12 items-center justify-center rounded-full bg-[#a9743c] text-sm font-semibold text-white"
+                  className="inline-flex h-12 items-center justify-center rounded-full bg-[#111111] text-sm font-semibold text-white"
                 >
                   Get Started
                 </Link>

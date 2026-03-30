@@ -218,9 +218,7 @@ const categoryProducts: TileCategoryProduct[] = [
 function TileCard({
   item,
 }: {
-  item:
-    | TileCollectionItem
-    | TileCategoryProduct;
+  item: TileCollectionItem | TileCategoryProduct;
 }) {
   return (
     <Link
@@ -272,12 +270,12 @@ export function ImmersiveLanding() {
   const heroStatsRef = useRef<HTMLDivElement | null>(null);
 
   const [activeCategoryId, setActiveCategoryId] = useState<string>(
-    tileCategories[0].id
+    tileCategories[0].id,
   );
 
   const filteredCategoryProducts = useMemo(() => {
     return categoryProducts.filter(
-      (item) => item.categoryId === activeCategoryId
+      (item) => item.categoryId === activeCategoryId,
     );
   }, [activeCategoryId]);
 
@@ -298,7 +296,7 @@ export function ImmersiveLanding() {
               trigger: el,
               start: "top 84%",
             },
-          }
+          },
         );
       });
 
@@ -311,7 +309,7 @@ export function ImmersiveLanding() {
             y: 0,
             duration: 1,
             ease: "power4.out",
-          }
+          },
         );
       }
 
@@ -325,7 +323,7 @@ export function ImmersiveLanding() {
             duration: 0.9,
             delay: 0.15,
             ease: "power4.out",
-          }
+          },
         );
       }
 
@@ -452,51 +450,59 @@ export function ImmersiveLanding() {
           />
 
           <div
-            className="absolute inset-0 bg-[linear-gradient(90deg,rgba(24,20,17,0.36)_0%,rgba(24,20,17,0.16)_34%,rgba(24,20,17,0.04)_62%,rgba(24,20,17,0.10)_100%)]"
+            className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,15,12,0.62)_0%,rgba(18,15,12,0.38)_32%,rgba(18,15,12,0.16)_60%,rgba(18,15,12,0.22)_100%)]"
             aria-hidden="true"
           />
 
           <div
             ref={heroOverlayRef}
-            className="absolute inset-0 bg-[radial-gradient(circle_at_16%_20%,rgba(255,255,255,0.18),transparent_26%),radial-gradient(circle_at_78%_18%,rgba(255,255,255,0.12),transparent_22%)]"
+            className="absolute inset-0 bg-[radial-gradient(circle_at_16%_20%,rgba(255,255,255,0.14),transparent_24%),radial-gradient(circle_at_80%_18%,rgba(255,255,255,0.08),transparent_22%)]"
             aria-hidden="true"
           />
 
           <div
-            className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.10))]"
+            className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.14)_55%,rgba(0,0,0,0.28)_100%)]"
             aria-hidden="true"
           />
 
           <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1720px] flex-col justify-between px-6 pb-7 pt-[108px] sm:px-8 md:px-10 md:pb-10 md:pt-[124px] lg:px-14">
             <div
               ref={heroContentRef}
-              className="max-w-[36rem] space-y-4 md:space-y-5"
+              className="max-w-[40rem] space-y-4 md:space-y-5"
             >
-              <span className="inline-flex rounded-full border border-white/18 bg-white/10 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur-md md:text-[11px]">
+              <span className="inline-flex rounded-full border border-white/18 bg-black/18 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/92 backdrop-blur-md md:text-[11px]">
                 Premium tiles for modern spaces
               </span>
 
-              <h1 className="max-w-[8ch] text-[clamp(2.9rem,6vw,6.1rem)] font-semibold leading-[0.92] tracking-[-0.065em] text-white">
+              <h1 className="max-w-[9ch] text-[clamp(2.9rem,6vw,6.1rem)] font-semibold leading-[0.92] tracking-[-0.065em] text-white [text-shadow:0_10px_30px_rgba(0,0,0,0.28)]">
                 Discover premium tiles for beautifully finished spaces.
               </h1>
 
-              <p className="max-w-[34rem] text-sm leading-7 text-white/80 md:text-[1rem] md:leading-8">
+              <p className="max-w-[36rem] text-sm leading-7 text-white/88 md:text-[1rem] md:leading-8">
                 Explore wall and floor tile collections, preview them in room
                 visualizers, and book expert assistance for the right finish,
                 size, and style.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-1">
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Link
+                  href={ROUTES.booking}
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-[#a9743c] px-6 text-sm font-semibold text-white shadow-[0_16px_36px_rgba(169,116,60,0.32)] transition hover:translate-y-[-1px] hover:bg-[#95632f]"
+                >
+                  Book Consultation
+                  <ArrowRight size={16} />
+                </Link>
+
                 <Link
                   href={ROUTES.catalog}
-                  className="inline-flex h-11 items-center rounded-full bg-[#a9743c] px-5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(169,116,60,0.22)] transition hover:translate-y-[-1px] hover:bg-[#95632f]"
+                  className="inline-flex h-12 items-center rounded-full border border-white/18 bg-[rgba(255,255,255,0.14)] px-6 text-sm font-semibold !text-white backdrop-blur-md transition hover:bg-[rgba(255,255,255,0.20)]"
                 >
-                  Explore Tiles
+                  View Catalog
                 </Link>
 
                 <Link
                   href={ROUTES.visualizer}
-                  className="inline-flex h-11 items-center rounded-full bg-white/78 px-5 text-sm font-semibold text-[#181512] backdrop-blur-md transition hover:bg-white"
+                  className="inline-flex h-12 items-center rounded-full border border-white/12 bg-black/20 px-6 text-sm font-semibold !text-white/92 backdrop-blur-md transition hover:bg-black/28"
                 >
                   Open Visualizer
                 </Link>
@@ -526,10 +532,7 @@ export function ImmersiveLanding() {
         </div>
       </section>
 
-      <section
-        id="about"
-        className="pb-10 pt-6 md:pb-14 md:pt-8"
-      >
+      <section id="about" className="pb-10 pt-6 md:pb-14 md:pt-8">
         <div
           data-reveal
           className={`${shell} grid gap-8 border-b border-black/8 pb-10 md:grid-cols-[180px_1fr] md:pb-14`}
@@ -607,7 +610,7 @@ export function ImmersiveLanding() {
 
               <Link
                 href={ROUTES.visualizer}
-                className="inline-flex h-11 w-fit items-center gap-2 rounded-full bg-[#121212] px-5 text-sm font-semibold text-white"
+                className="inline-flex h-11 w-fit items-center gap-2 rounded-full bg-[#121212] px-5 text-sm font-semibold !text-white"
               >
                 Try Visualizer
                 <ArrowRight size={16} />
@@ -660,7 +663,7 @@ export function ImmersiveLanding() {
         <div data-reveal className={`${shell} mt-8 flex justify-center`}>
           <Link
             href={ROUTES.catalog}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-[#121212] px-5 text-sm font-semibold text-white"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-[#121212] px-5 text-sm font-semibold !text-white"
           >
             View Full Catalog
             <ArrowRight size={16} />
@@ -681,23 +684,33 @@ export function ImmersiveLanding() {
           />
 
           <div className="relative z-10 flex min-h-[290px] flex-col justify-between p-6 md:min-h-[360px] md:p-10">
-            <div className="max-w-[23rem] text-[clamp(1.9rem,3vw,3.6rem)] font-semibold leading-[1] tracking-[-0.06em] text-white">
+            <div className="max-w-[24rem] text-[clamp(1.9rem,3vw,3.6rem)] font-semibold leading-[1] tracking-[-0.06em] text-white [text-shadow:0_10px_30px_rgba(0,0,0,0.25)]">
               Find the right tile collection for your next space.
             </div>
 
             <div className="flex flex-col gap-4 md:items-end">
-              <p className="max-w-[22rem] text-sm leading-7 text-white/78 md:text-right">
-                Book a service, explore the catalog, or preview tile finishes in
-                your room before making a final choice.
+              <p className="max-w-[24rem] text-sm leading-7 text-white/86 md:text-right">
+                Book a consultation first if you want guided product selection,
+                room advice, and help choosing the right tile finish for your
+                space.
               </p>
 
-              <Link
-                href={ROUTES.booking}
-                className="inline-flex h-11 w-fit items-center gap-2 rounded-full bg-[#121212] px-5 text-sm font-semibold text-white"
-              >
-                Book Service
-                <ArrowRight size={16} />
-              </Link>
+              <div className="flex flex-wrap gap-3 md:justify-end">
+                <Link
+                  href={ROUTES.booking}
+                  className="inline-flex h-12 w-fit items-center gap-2 rounded-full bg-[#a9743c] px-6 text-sm font-semibold !text-white shadow-[0_16px_36px_rgba(169,116,60,0.30)] transition hover:translate-y-[-1px] hover:bg-[#95632f]"
+                >
+                  Book Consultation
+                  <ArrowRight size={16} />
+                </Link>
+
+                <Link
+                  href={ROUTES.catalog}
+                  className="inline-flex h-12 w-fit items-center rounded-full border border-white/18 bg-[rgba(255,255,255,0.14)] px-6 text-sm font-semibold !text-white backdrop-blur-md transition hover:bg-[rgba(255,255,255,0.20)]"
+                >
+                  View Catalog
+                </Link>
+              </div>
             </div>
           </div>
         </div>
