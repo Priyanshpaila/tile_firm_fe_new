@@ -7,6 +7,7 @@ export const ROUTES = {
   visualizer3d: "/visualizer/3d",
   booking: "/booking",
   uploadRoom: "/upload-room",
+  staff: "/staff",
   dashboard: "/dashboard",
   profile: "/profile",
   admin: "/admin"
@@ -14,6 +15,6 @@ export const ROUTES = {
 
 export function roleHome(role?: string | null) {
   if (role === "admin") return ROUTES.admin;
-  if (role === "staff") return ROUTES.dashboard;
+  if (role === "staff") return ROUTES.staff;
   return ROUTES.dashboard;
 }
