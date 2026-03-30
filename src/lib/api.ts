@@ -25,6 +25,17 @@ type StaffMutationResponse = {
   loginAccount?: StaffLoginAccount;
 };
 
+type AppointmentQueryParams = {
+  from?: string;
+  to?: string;
+  date?: string;
+  status?: string;
+  staffId?: string;
+  userId?: string;
+  page?: number;
+  limit?: number;
+};
+
 export const api = {
   auth: {
     register: (payload: { name: string; email: string; password: string; phone?: string }) =>
@@ -180,11 +191,24 @@ export const api = {
 
   uploads: {
     single: (formData: FormData) =>
-      apiRequest<ApiResponse<{ upload: UploadRecord }>>("/uploads/single", {
-        method: "POST",
-        body: formData,
-        isFormData: true,
-      }),
+      apiRequest<ApiResponse<{ upload: UploadRecord; fileUrl: string }>>(
+        "/uploads/single",
+        {
+          method: "POST",
+          body: formData,
+          isFormData: true,
+        }
+      ),
+
+    multiple: (formData: FormData) =>
+      apiRequest<ApiResponse<{ uploads: UploadRecord[]; fileUrls: string[] }>>(
+        "/uploads/multiple",
+        {
+          method: "POST",
+          body: formData,
+          isFormData: true,
+        }
+      ),
   },
 
   appointments: {
@@ -206,14 +230,24 @@ export const api = {
         body: payload,
       }),
 
-    myAppointments: () =>
+    myAppointments: (params: AppointmentQueryParams = {}) =>
       apiRequest<ApiResponse<{ appointments: Appointment[] }>>(
-        "/appointments/my-appointments"
+        `/appointments/my-appointments?${buildQuery(params)}`
       ),
 
-    list: (params: Record<string, unknown> = {}) =>
+    list: (params: AppointmentQueryParams = {}) =>
       apiRequest<ApiResponse<{ appointments: Appointment[] }>>(
         `/appointments?${buildQuery(params)}`
+      ),
+
+    calendar: (params: AppointmentQueryParams = {}) =>
+      apiRequest<ApiResponse<{ appointments: Appointment[] }>>(
+        `/appointments/calendar?${buildQuery(params)}`
+      ),
+
+    staffMyAppointments: (params: AppointmentQueryParams = {}) =>
+      apiRequest<ApiResponse<{ appointments: Appointment[] }>>(
+        `/appointments/staff/my-appointments?${buildQuery(params)}`
       ),
 
     assignStaff: (id: string, staffId: string) =>

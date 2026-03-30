@@ -12,6 +12,7 @@ import { ProductModal } from "./_components/product-modal";
 import { CategoryModal } from "./_components/category-modal";
 import { StaffModal } from "./_components/staff-modal";
 import { useAdminDashboard } from "./_hooks/use-admin-dashboard";
+import { AdminAppointmentsTab } from "./_components/admin-appointments-tab";
 
 export default function AdminPage() {
   const admin = useAdminDashboard();
@@ -36,6 +37,8 @@ export default function AdminPage() {
               error={admin.dashboardError}
             />
           ) : null}
+
+          {admin.activeTab === "appointments" ? <AdminAppointmentsTab /> : null}
 
           {admin.activeTab === "products" ? (
             <AdminProductsTab
