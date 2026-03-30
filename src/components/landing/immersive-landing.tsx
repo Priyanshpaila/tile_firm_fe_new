@@ -541,7 +541,7 @@ export function ImmersiveLanding() {
           <p className="max-w-[56rem] text-[clamp(1.3rem,2vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.05em] text-[#1e1a17]">
             We help customers choose tiles that look refined, perform well, and
             fit the space correctly. From living rooms to bathrooms and outdoor
-            areas, TileVista combines curated collections, room previews, and
+            areas, SquareFoot combines curated collections, room previews, and
             expert support in one premium experience.
           </p>
         </div>

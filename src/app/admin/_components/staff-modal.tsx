@@ -89,7 +89,7 @@ export function StaffModal({
                       onChange={(e) =>
                         setForm((prev) => ({ ...prev, email: e.target.value }))
                       }
-                      placeholder="e.g. aman@tilevista.com"
+                      placeholder="e.g. aman@SquareFoot.com"
                     />
                   </label>
 

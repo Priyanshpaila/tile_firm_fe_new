@@ -44,7 +44,7 @@ export function SiteFooter() {
           <div className="grid gap-8 md:grid-cols-[1.15fr_0.8fr_0.8fr_1.1fr] md:gap-10">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.28em] text-white/45">
-                TileVista
+                SquareFoot
               </p>
 
               <h3 className="mt-3 max-w-[21rem] text-[1.55rem] font-semibold leading-[1.04] tracking-[-0.05em] text-white md:text-[2rem]">
@@ -73,7 +73,7 @@ export function SiteFooter() {
             <div>
               <h4 className="text-sm font-semibold text-white/90">Contact Us</h4>
               <div className="mt-4 space-y-2 text-sm leading-7 text-white/60">
-                <p>hello@tilevista.com</p>
+                <p>hello@SquareFoot.com</p>
                 <p>+91 90000 00000</p>
                 <p>Mon - Sat · 10:00 AM to 7:00 PM</p>
               </div>
@@ -82,7 +82,7 @@ export function SiteFooter() {
             <div>
               <h4 className="text-sm font-semibold text-white/90">Location</h4>
               <div className="mt-4 space-y-2 text-sm leading-7 text-white/60">
-                <p>TileVista Experience Center</p>
+                <p>SquareFoot Experience Center</p>
                 <p>Raipur, Chhattisgarh</p>
                 <p>India</p>
               </div>
@@ -124,7 +124,7 @@ export function SiteFooter() {
           <div className="mt-7 h-px w-full bg-white/10" />
 
           <div className="mt-4 flex flex-col gap-3 text-sm text-white/45 md:flex-row md:items-center md:justify-between">
-            <p>© 2026 TileVista. All rights reserved.</p>
+            <p>© 2026 SquareFoot. All rights reserved.</p>
             <div className="flex flex-wrap gap-4">
               <Link href="#" className="transition hover:text-white/75">
                 Privacy Policy
@@ -138,7 +138,7 @@ export function SiteFooter() {
 
         <div className="pointer-events-none select-none overflow-hidden px-4 pb-1 md:px-8">
           <div className="translate-y-[34%] text-[4rem] font-semibold tracking-[-0.07em] text-white/8 md:text-[8.5rem]">
-            TILEVISTA
+            SquareFoot
           </div>
         </div>
       </div>

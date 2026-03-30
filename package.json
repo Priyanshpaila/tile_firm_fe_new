@@ -1,8 +1,8 @@
 {
-  "name": "tilevista-frontend",
+  "name": "SquareFoot-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "Next.js frontend starter for TileVista backend",
+  "description": "Next.js frontend starter for SquareFoot backend",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

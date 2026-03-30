@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 
 export const metadata: Metadata = {
-  title: "TileVista",
+  title: "SquareFoot",
   description: "Tiles and interiors frontend starter wired to the provided backend.",
 };
 
