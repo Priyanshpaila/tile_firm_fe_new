@@ -61,6 +61,43 @@ function PinAutoFill({
   const [pinStatusMsg, setPinStatusMsg] = useState("");
   const lastPinRef = useRef<string | null>(null);
 
+  function cleanPostOfficeName(name: string) {
+    return String(name || "")
+      .replace(/\b(HO|GPO|S\.?O|H\.?O|B\.?O)\b/gi, "")
+      .replace(/\bA\s*O\b/gi, "")
+      .replace(/\bSub Post Office\b/gi, "")
+      .replace(/\bHead Post Office\b/gi, "")
+      .replace(/\bPost Office\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function normalizeCityFromOffice(office: any) {
+    const rawName = cleanPostOfficeName(office?.Name || "");
+
+    if (!rawName) {
+      return String(
+        office?.Block || office?.District || office?.Division || "",
+      ).trim();
+    }
+
+    // If name is like "Bhilai 1", convert to "Bhilai"
+    const noTrailingNumber = rawName.replace(/\s+\d+\s*$/, "").trim();
+
+    // If name is like "Sector 2 Bhilai", keep it as-is because it is still useful
+    return noTrailingNumber || rawName;
+  }
+
+  function normalizeStateName(state: string) {
+    const value = String(state || "").trim();
+    if (!value) return value;
+
+    // optional correction for common typo returned by some postal records
+    if (value.toLowerCase() === "chattisgarh") return "Chhattisgarh";
+
+    return value;
+  }
+
   useEffect(() => {
     const cleanPin = String(pin ?? "")
       .replace(/\D/g, "")
@@ -92,18 +129,22 @@ function PinAutoFill({
           );
 
           const json = await response.json();
-          const data = Array.isArray(json) ? json[0] : null;
+          const payload = Array.isArray(json) ? json[0] : null;
+          const offices = Array.isArray(payload?.PostOffice)
+            ? payload.PostOffice
+            : [];
 
-          if (data?.Status === "Success" && data?.PostOffice?.length) {
-            const office = data.PostOffice[0];
-            const city = String(
-              office?.Block ||
-                office?.Division ||
-                office?.District ||
-                office?.Name ||
-                "",
-            ).trim();
-            const state = String(office?.State || "").trim();
+          if (payload?.Status === "Success" && offices.length > 0) {
+            const preferredOffice =
+              offices.find(
+                (office: any) =>
+                  String(office?.DeliveryStatus || "").toLowerCase() ===
+                  "delivery",
+              ) || offices[0];
+
+            const city = normalizeCityFromOffice(preferredOffice);
+            const state = normalizeStateName(preferredOffice?.State || "");
+            const district = String(preferredOffice?.District || "").trim();
 
             if (city || state) {
               setForm((prev) => ({
@@ -111,9 +152,14 @@ function PinAutoFill({
                 city: city || prev.city,
                 state: state || prev.state,
               }));
+
               setPinStatus("success");
               setPinStatusMsg(
-                `${city}${city && state ? ", " : ""}${state}`.trim(),
+                `${city}${city && state ? ", " : ""}${state}${
+                  district && district !== city
+                    ? ` • District: ${district}`
+                    : ""
+                }`,
               );
               lastPinRef.current = cleanPin;
               return;
@@ -137,13 +183,14 @@ function PinAutoFill({
           const json = await fallback.json();
           const place = json?.places?.[0];
           const city = String(place?.["place name"] || "").trim();
-          const state = String(place?.state || "").trim();
+          const state = normalizeStateName(place?.state || "");
 
           setForm((prev) => ({
             ...prev,
             city: city || prev.city,
             state: state || prev.state,
           }));
+
           setPinStatus("success");
           setPinStatusMsg(`${city}${city && state ? ", " : ""}${state}`.trim());
           lastPinRef.current = cleanPin;
@@ -561,7 +608,7 @@ export default function BookingPage() {
                       onChange={(e) =>
                         setForm((prev) => ({ ...prev, notes: e.target.value }))
                       }
-                     className="h-14 w-full rounded-[1rem] border border-[var(--border-soft)] bg-[#fcfbf8] !pl-12 !pr-4 text-[15px] text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-secondary)]/70 focus:border-[#b88a5b] focus:bg-white focus:ring-4 focus:ring-[#b88a5b]/10"
+                      className="h-14 w-full rounded-[1rem] border border-[var(--border-soft)] bg-[#fcfbf8] !pl-12 !pr-4 text-[15px] text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-secondary)]/70 focus:border-[#b88a5b] focus:bg-white focus:ring-4 focus:ring-[#b88a5b]/10"
                     />
                   </div>
                   <div className="text-right text-xs text-[var(--text-secondary)]">
