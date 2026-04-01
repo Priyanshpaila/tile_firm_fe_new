@@ -18,7 +18,7 @@ import { AuthGuard } from "@/components/layout/auth-guard";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
-import { api } from "@/lib/api";
+import { api, resolveUploadUrl } from "@/lib/api";
 
 type ProfileFormState = {
   name: string;
@@ -84,7 +84,10 @@ export default function ProfilePage() {
   const initials = useMemo(() => {
     const name = user?.name?.trim() || "U";
     const parts = name.split(/\s+/).filter(Boolean);
-    return parts.slice(0, 2).map((item) => item[0]?.toUpperCase()).join("");
+    return parts
+      .slice(0, 2)
+      .map((item) => item[0]?.toUpperCase())
+      .join("");
   }, [user?.name]);
 
   const handleProfileSubmit = async (event: FormEvent) => {
@@ -174,14 +177,19 @@ export default function ProfilePage() {
       formData.append("uploadType", "avatar");
 
       const uploadRes = await api.uploads.single(formData);
-      const avatarUrl =
+
+      const rawAvatarUrl =
         uploadRes.data.upload?.url || uploadRes.data.fileUrl || "";
 
-      if (!avatarUrl) {
-        throw new Error("Avatar upload succeeded but no file URL was returned.");
+      if (!rawAvatarUrl) {
+        throw new Error(
+          "Avatar upload succeeded but no file URL was returned.",
+        );
       }
 
-      await api.users.updateProfile({ avatar: avatarUrl });
+      const fullAvatarUrl = resolveUploadUrl(rawAvatarUrl);
+
+      await api.users.updateProfile({ avatar: fullAvatarUrl });
       await refreshMe();
 
       setAvatarMessage("Profile photo updated successfully.");
@@ -239,7 +247,7 @@ export default function ProfilePage() {
                 <div className="relative">
                   {user?.avatar ? (
                     <img
-                      src={user.avatar}
+                      src={resolveUploadUrl(user.avatar)}
                       alt={user.name || "Profile"}
                       className="h-24 w-24 rounded-full border border-white/10 object-cover"
                     />
@@ -319,9 +327,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="mt-5">
-                {messageBox(avatarMessage)}
-              </div>
+              <div className="mt-5">{messageBox(avatarMessage)}</div>
             </div>
 
             <div className="rounded-[1.5rem] border border-[var(--border-soft)] bg-white p-5 shadow-[0_12px_30px_rgba(20,16,10,0.05)]">
@@ -636,7 +642,9 @@ export default function ProfilePage() {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-h-[24px]">{messageBox(passwordMessage)}</div>
+                <div className="min-h-[24px]">
+                  {messageBox(passwordMessage)}
+                </div>
 
                 <Button
                   type="submit"

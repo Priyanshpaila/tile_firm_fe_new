@@ -36,6 +36,50 @@ type AppointmentQueryParams = {
   limit?: number;
 };
 
+const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
+function getBackendOrigin() {
+  const normalized = RAW_API_BASE.replace(/\/$/, "");
+  if (!normalized) return "";
+
+  return normalized.replace(/\/api$/i, "");
+}
+
+function extractUploadFilename(url?: string | null) {
+  if (!url) return "";
+
+  const clean = url.split("?")[0].split("#")[0];
+
+  const match = clean.match(/\/uploads\/([^/]+)$/i);
+  if (match?.[1]) {
+    return match[1];
+  }
+
+  return "";
+}
+
+export const resolveUploadUrl = (url?: string | null) => {
+  if (!url) return "";
+
+  const backendOrigin = getBackendOrigin();
+  const filename = extractUploadFilename(url);
+
+  if (filename && backendOrigin) {
+    return `${backendOrigin}/uploads/${filename}`;
+  }
+
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  if (backendOrigin) {
+    const relative = url.startsWith("/") ? url : `/${url}`;
+    return `${backendOrigin}${relative}`;
+  }
+
+  return url;
+};
+
 export const api = {
   auth: {
     register: (payload: { name: string; email: string; password: string; phone?: string }) =>
