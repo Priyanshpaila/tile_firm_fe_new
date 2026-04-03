@@ -92,7 +92,7 @@ export function AdminAppointmentsTab() {
           void handleAssignStaff(appointmentId, staffId)
         }
         onUpdateStatus={(appointmentId, status) =>
-          void handleUpdateStatus(appointmentId, status)
+          void handleUpdateStatus(appointmentId, status.toLowerCase())
         }
       />
     </SectionCard>
