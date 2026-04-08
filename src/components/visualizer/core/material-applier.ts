@@ -9,33 +9,49 @@ type Args = {
   appliedTiles: AppliedTiles;
 };
 
-const textureLoader = new THREE.TextureLoader();
-textureLoader.setCrossOrigin("anonymous");
-
+const loader = new THREE.TextureLoader();
 const textureCache = new Map<string, THREE.Texture>();
 
-function normalizeValue(value: string) {
+function normalize(value: string) {
   return value
     .toLowerCase()
-    .replace(/[_-]+/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-function getMaterialNames(material: Material | Material[]) {
+function materialNames(material: Material | Material[]) {
   if (Array.isArray(material)) {
-    return material.map((item) => item.name || "").filter(Boolean);
+    return material.map((m) => m.name || "").join(" ");
   }
-
-  return [material.name || ""].filter(Boolean);
+  return material.name || "";
 }
 
-function meshMatchesTarget(mesh: Mesh, targets: string[]) {
-  const haystack = normalizeValue(
-    [mesh.name, ...getMaterialNames(mesh.material)].join(" "),
+function meshText(mesh: Mesh) {
+  return normalize(
+    [
+      mesh.name || "",
+      mesh.parent?.name || "",
+      mesh.geometry?.name || "",
+      materialNames(mesh.material),
+    ].join(" "),
   );
+}
 
-  return targets.some((target) => haystack.includes(normalizeValue(target)));
+function matchesTarget(mesh: Mesh, targets: string[]) {
+  const text = meshText(mesh);
+
+  return targets.some((target) => {
+    const t = normalize(target);
+    return text === t || text.includes(t);
+  });
+}
+
+function getSurface(mesh: Mesh, config: RoomConfig): SurfaceType | null {
+  if (matchesTarget(mesh, config.floorMeshes)) return "floor";
+  if (matchesTarget(mesh, config.wallMeshes)) return "wall";
+  if (matchesTarget(mesh, config.ceilingMeshes)) return "ceiling";
+  return null;
 }
 
 function getRepeat(surface: SurfaceType, config: RoomConfig, tileScale: number) {
@@ -48,7 +64,7 @@ function getTexture(url: string, repeat: number) {
   let texture = textureCache.get(key);
 
   if (!texture) {
-    texture = textureLoader.load(url);
+    texture = loader.load(url);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.colorSpace = THREE.SRGBColorSpace;
@@ -63,62 +79,77 @@ function getTexture(url: string, repeat: number) {
 }
 
 function cloneBaseMaterial(material: Material) {
-  const cloned = material.clone();
+  const cloned = material.clone() as THREE.Material & {
+    map?: THREE.Texture | null;
+    color?: THREE.Color;
+    roughness?: number;
+    metalness?: number;
+    side?: THREE.Side;
+    needsUpdate?: boolean;
+  };
 
-  if ("color" in cloned && cloned.color) {
+  if (cloned.color) {
     cloned.color = new THREE.Color("#ffffff");
   }
 
-  if ("vertexColors" in cloned) {
-    cloned.vertexColors = false;
+  if (typeof cloned.roughness === "number") {
+    cloned.roughness = 0.9;
   }
 
-  if ("roughness" in cloned && typeof cloned.roughness === "number") {
-    cloned.roughness = Math.min(cloned.roughness, 0.95);
-  }
-
-  if ("metalness" in cloned && typeof cloned.metalness === "number") {
+  if (typeof cloned.metalness === "number") {
     cloned.metalness = 0.04;
   }
 
+  cloned.side = THREE.DoubleSide;
   return cloned;
 }
 
-function buildMaterialFromBase(
-  base: Material | Material[],
+function getStoredBaseMaterial(mesh: Mesh) {
+  if (!mesh.userData.__baseMaterial) {
+    mesh.userData.__baseMaterial = Array.isArray(mesh.material)
+      ? mesh.material.map((m: Material) => m.clone())
+      : mesh.material.clone();
+  }
+
+  return mesh.userData.__baseMaterial as Material | Material[];
+}
+
+function restoreBaseMaterial(mesh: Mesh) {
+  const base = getStoredBaseMaterial(mesh);
+
+  mesh.material = Array.isArray(base)
+    ? base.map((m) => m.clone())
+    : base.clone();
+}
+
+function applyTextureToMesh(
+  mesh: Mesh,
   texture: THREE.Texture,
-): Material | Material[] {
+) {
+  const base = getStoredBaseMaterial(mesh);
+
   if (Array.isArray(base)) {
-    return base.map((item) => {
-      const material = cloneBaseMaterial(item) as THREE.Material & {
+    mesh.material = base.map((m) => {
+      const next = cloneBaseMaterial(m) as THREE.Material & {
         map?: THREE.Texture | null;
         needsUpdate?: boolean;
       };
 
-      material.map = texture;
-      material.needsUpdate = true;
-      return material;
+      next.map = texture;
+      next.needsUpdate = true;
+      return next;
     });
+    return;
   }
 
-  const material = cloneBaseMaterial(base) as THREE.Material & {
+  const next = cloneBaseMaterial(base) as THREE.Material & {
     map?: THREE.Texture | null;
     needsUpdate?: boolean;
   };
 
-  material.map = texture;
-  material.needsUpdate = true;
-  return material;
-}
-
-function getStoredBaseMaterial(mesh: Mesh) {
-  if (!mesh.userData.__visualizerBaseMaterial) {
-    mesh.userData.__visualizerBaseMaterial = Array.isArray(mesh.material)
-      ? mesh.material.map((item: Material) => item.clone())
-      : mesh.material.clone();
-  }
-
-  return mesh.userData.__visualizerBaseMaterial as Material | Material[];
+  next.map = texture;
+  next.needsUpdate = true;
+  mesh.material = next;
 }
 
 export function applyMaterialToMeshes({
@@ -131,34 +162,19 @@ export function applyMaterialToMeshes({
     if (!(child instanceof THREE.Mesh)) return;
 
     const mesh = child as Mesh;
-    const baseMaterial = getStoredBaseMaterial(mesh);
+    const surface = getSurface(mesh, config);
 
-    const applySurface = (surface: SurfaceType, targets: string[]) => {
-      const textureUrl = appliedTiles[surface];
-      if (!textureUrl) return false;
-      if (!meshMatchesTarget(mesh, targets)) return false;
+    if (!surface) return;
 
-      const repeat = getRepeat(surface, config, tileScale);
-      const texture = getTexture(textureUrl, repeat);
-      mesh.material = buildMaterialFromBase(baseMaterial, texture);
-      return true;
-    };
+    const textureUrl = appliedTiles[surface];
 
-    const applied =
-      applySurface("floor", config.floorMeshes) ||
-      applySurface("wall", config.wallMeshes) ||
-      applySurface("ceiling", config.ceilingMeshes);
-
-    if (!applied && mesh.userData.__visualizerRestored !== true) {
-      mesh.material = Array.isArray(baseMaterial)
-        ? baseMaterial.map((item) => item.clone())
-        : baseMaterial.clone();
-
-      mesh.userData.__visualizerRestored = true;
+    if (!textureUrl) {
+      restoreBaseMaterial(mesh);
+      return;
     }
 
-    if (applied) {
-      mesh.userData.__visualizerRestored = false;
-    }
+    const repeat = getRepeat(surface, config, tileScale);
+    const texture = getTexture(textureUrl, repeat);
+    applyTextureToMesh(mesh, texture);
   });
 }

@@ -26,9 +26,10 @@ export const ROOM_CONFIGS: Record<string, RoomConfig> = {
     modelOffset: [0, 0, 0],
     target: [0, 1.1, 0],
 
+
     twoDCamera: {
-      position: [5.8, 2.35, 6.8],
-      fov: 42,
+      position: [2.04, 2.35, 4.15],
+      fov: 46,
     },
 
     threeDCamera: {

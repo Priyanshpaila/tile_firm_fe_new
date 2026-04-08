@@ -8,6 +8,7 @@ export type AppliedTiles = {
 
 export type RoomConfig = {
   modelUrl: string;
+
   floorMeshes: string[];
   wallMeshes: string[];
   ceilingMeshes: string[];

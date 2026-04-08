@@ -56,15 +56,15 @@ export default function ThreeDRoom({
       />
 
       <ambientLight intensity={0.82} />
-      <hemisphereLight intensity={0.95} groundColor="#d7d0c5" />
+      <hemisphereLight intensity={0.95} groundColor="#d8d0c4" />
       <directionalLight
         castShadow
-        intensity={1.35}
+        intensity={1.3}
         position={[8, 10, 8]}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
-      <directionalLight intensity={0.38} position={[-6, 4, 2]} />
+      <directionalLight intensity={0.36} position={[-5, 4, 2]} />
 
       <Suspense fallback={null}>
         <BaseRoomScene
@@ -83,7 +83,7 @@ export default function ThreeDRoom({
         target={config.target}
         minDistance={config.controls.minDistance}
         maxDistance={config.controls.maxDistance}
-        minPolarAngle={config.controls.minPolarAngle ?? 0.55}
+        minPolarAngle={config.controls.minPolarAngle ?? 0.72}
         maxPolarAngle={config.controls.maxPolarAngle ?? 1.42}
       />
     </Canvas>

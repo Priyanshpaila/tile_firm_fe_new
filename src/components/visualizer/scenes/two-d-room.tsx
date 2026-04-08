@@ -55,15 +55,15 @@ export default function TwoDRoom({
       />
 
       <ambientLight intensity={0.85} />
-      <hemisphereLight intensity={0.9} groundColor="#d7d0c5" />
+      <hemisphereLight intensity={0.9} groundColor="#d8d0c4" />
       <directionalLight
         castShadow
-        intensity={1.25}
-        position={[7, 9, 8]}
+        intensity={1.2}
+        position={[7, 9, 7]}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
-      <directionalLight intensity={0.35} position={[-5, 4, 2]} />
+      <directionalLight intensity={0.3} position={[-4, 4, 2]} />
 
       <Suspense fallback={null}>
         <BaseRoomScene
