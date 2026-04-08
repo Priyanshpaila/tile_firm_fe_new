@@ -5,8 +5,8 @@ import { CheckCircle2, Loader2, RotateCcw, UploadCloud } from "lucide-react";
 import { AuthGuard } from "@/components/layout/auth-guard";
 import { PageShell } from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
-import { useVisualizerCatalog } from "@/components/visualizer/use-visualizer-catalog";
-import { ProductStrip } from "@/components/visualizer/product-strip";
+import { useVisualizerCatalog } from "@/components/visualizer/hooks/use-visualizer-catalog";
+import { ProductStrip } from "@/components/visualizer/ui/product-strip";
 import { getProductPreview, resolveAssetUrl } from "@/components/visualizer/utils";
 import { api } from "@/lib/api";
 
