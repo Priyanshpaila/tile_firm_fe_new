@@ -1,29 +1,44 @@
 "use client";
 
+import {
+  CalendarDays,
+  LayoutGrid,
+  ListChecks,
+} from "lucide-react";
 import { AuthGuard } from "@/components/layout/auth-guard";
-import { PageShell } from "@/components/layout/page-shell";
-import { StaffTabs } from "./_components/staff-tabs";
+import {
+  DashboardShell,
+  type DashboardTabDefinition,
+} from "@/components/dashboard/dashboard-shell";
 import { StaffOverviewTab } from "./_components/staff-overview-tab";
 import { StaffAppointmentsTab } from "./_components/staff-appointments-tab";
 import { StaffTodayTab } from "./_components/staff-today-tab";
-import { useStaffDashboard } from "./_hooks/use-staff-dashboard";
+import {
+  useStaffDashboard,
+  type StaffDashboardTab,
+} from "./_hooks/use-staff-dashboard";
+
+const tabs: DashboardTabDefinition<StaffDashboardTab>[] = [
+  { key: "overview", label: "Overview", icon: LayoutGrid },
+  { key: "appointments", label: "Calendar", icon: CalendarDays },
+  { key: "today", label: "Today Queue", icon: ListChecks },
+];
 
 export default function StaffDashboardPage() {
   const dashboard = useStaffDashboard();
 
   return (
     <AuthGuard roles={["staff"]}>
-      <PageShell
+      <DashboardShell
+        role="staff"
         title="Staff Dashboard"
         description="Track assigned appointments, daily queues, and current workload."
+        tabs={tabs}
+        activeTab={dashboard.activeTab}
+        onChange={dashboard.setActiveTab}
       >
         <div className="grid gap-6">
-          <StaffTabs
-            activeTab={dashboard.activeTab}
-            onChange={dashboard.setActiveTab}
-          />
-
-          {dashboard.activeTab === "overview" ? (
+          <section hidden={dashboard.activeTab !== "overview"}>
             <StaffOverviewTab
               user={dashboard.user}
               loading={dashboard.loading}
@@ -31,22 +46,22 @@ export default function StaffDashboardPage() {
               stats={dashboard.stats}
               nextAppointment={dashboard.nextAppointment}
             />
-          ) : null}
+          </section>
 
-          {dashboard.activeTab === "appointments" ? (
+          <section hidden={dashboard.activeTab !== "appointments"}>
             <StaffAppointmentsTab />
-          ) : null}
+          </section>
 
-          {dashboard.activeTab === "today" ? (
+          <section hidden={dashboard.activeTab !== "today"}>
             <StaffTodayTab
               loading={dashboard.loading}
               error={dashboard.error}
               todayAppointments={dashboard.todayAppointments}
               onRefresh={() => void dashboard.loadAppointments()}
             />
-          ) : null}
+          </section>
         </div>
-      </PageShell>
+      </DashboardShell>
     </AuthGuard>
   );
 }
