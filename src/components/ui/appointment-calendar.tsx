@@ -17,9 +17,12 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CreditCard,
+  IndianRupee,
   Loader2,
   MapPin,
   Phone,
+  Receipt,
   User2,
   X,
 } from "lucide-react";
@@ -30,6 +33,12 @@ import type { Appointment, Staff } from "@/types";
 type CalendarRange = {
   from: string;
   to: string;
+};
+
+type AppointmentWithPaymentMeta = Appointment & {
+  paymentMode?: string;
+  paymentMethod?: string;
+  mode?: string;
 };
 
 type AppointmentCalendarProps = {
@@ -95,6 +104,21 @@ function getStaffLabel(appointment: Appointment) {
   return appointment.staff.name || appointment.staff.email || "Assigned";
 }
 
+function getPaymentModeLabel(appointment: Appointment) {
+  const enriched = appointment as AppointmentWithPaymentMeta;
+  const value =
+    enriched.paymentMode || enriched.paymentMethod || enriched.mode || "";
+  if (!value) return "Not specified";
+  return value.replaceAll("_", " ");
+}
+
+function getAddressLabel(appointment: Appointment) {
+  return `${appointment.address.street}, ${appointment.address.city}, ${appointment.address.state} - ${appointment.address.pincode}`;
+}
+
+const selectClassName =
+  "h-11 w-full rounded-[0.9rem] border border-[var(--border-soft)] bg-white px-3 text-sm text-[var(--text-primary)] outline-none transition focus:border-[#b88a5b] focus:ring-4 focus:ring-[#b88a5b]/10";
+
 export function AppointmentCalendar({
   title,
   description,
@@ -153,6 +177,7 @@ export function AppointmentCalendar({
   const handleAssign = async (appointmentId: string) => {
     const staffId = assignDrafts[appointmentId];
     if (!staffId || !onAssignStaff) return;
+
     setBusyKey(`assign-${appointmentId}`);
     try {
       await onAssignStaff(appointmentId, staffId);
@@ -164,6 +189,7 @@ export function AppointmentCalendar({
   const handleStatusUpdate = async (appointmentId: string) => {
     const status = statusDrafts[appointmentId];
     if (!status || !onUpdateStatus) return;
+
     setBusyKey(`status-${appointmentId}`);
     try {
       await onUpdateStatus(appointmentId, status);
@@ -191,7 +217,7 @@ export function AppointmentCalendar({
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="inline-flex items-center rounded-full border border-[var(--border-soft)] bg-white p-1">
+            <div className="inline-flex items-center rounded-full border border-[var(--border-soft)] bg-white p-1 shadow-sm">
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -345,7 +371,7 @@ export function AppointmentCalendar({
 
       {selectedDay ? (
         <div className="fixed inset-0 z-[90] bg-black/55 p-3 backdrop-blur-sm sm:p-5">
-          <div className="mx-auto flex h-full max-w-4xl items-center justify-center">
+          <div className="mx-auto flex h-full max-w-5xl items-center justify-center">
             <div className="flex max-h-[94vh] w-full flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.25)]">
               <div className="border-b border-[var(--border-soft)] px-4 py-4 sm:px-5 md:px-6">
                 <div className="flex items-start justify-between gap-4">
@@ -386,10 +412,10 @@ export function AppointmentCalendar({
                       return (
                         <div
                           key={appointment._id}
-                          className="rounded-[1.25rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4"
+                          className="rounded-[1.25rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4 sm:p-5"
                         >
-                          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                            <div className="min-w-0">
+                          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="rounded-full bg-[#171411] px-3 py-1 text-xs font-semibold text-white">
                                   {appointment.ticketNumber}
@@ -402,62 +428,84 @@ export function AppointmentCalendar({
                                 </span>
                               </div>
 
-                              <div className="mt-4 grid gap-2 text-sm text-[var(--text-secondary)]">
-                                <div className="flex items-center gap-2">
-                                  <User2 className="h-4 w-4" />
-                                  <span>{getUserLabel(appointment)}</span>
+                              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)]">
+                                  <div className="mb-1 flex items-center gap-2 text-[var(--text-primary)]">
+                                    <User2 className="h-4 w-4" />
+                                    <span className="font-medium">Customer</span>
+                                  </div>
+                                  <p>{getUserLabel(appointment)}</p>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                  <CalendarDays className="h-4 w-4" />
-                                  <span>
+                                <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)]">
+                                  <div className="mb-1 flex items-center gap-2 text-[var(--text-primary)]">
+                                    <CalendarDays className="h-4 w-4" />
+                                    <span className="font-medium">Visit date</span>
+                                  </div>
+                                  <p>
                                     {format(
                                       new Date(appointment.date),
                                       "dd MMM yyyy",
                                     )}
-                                  </span>
+                                  </p>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4" />
-                                  <span>{getStaffLabel(appointment)}</span>
-                                </div>
-
-                                <div className="flex items-start gap-2">
-                                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                                  <span>
-                                    {appointment.address.street},{" "}
-                                    {appointment.address.city},{" "}
-                                    {appointment.address.state} -{" "}
-                                    {appointment.address.pincode}
-                                  </span>
-                                </div>
-
-                                {appointment.notes ? (
-                                  <div className="rounded-xl bg-white px-3 py-2 text-sm text-[var(--text-secondary)]">
-                                    {appointment.notes}
+                                <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)]">
+                                  <div className="mb-1 flex items-center gap-2 text-[var(--text-primary)]">
+                                    <Phone className="h-4 w-4" />
+                                    <span className="font-medium">Assigned staff</span>
                                   </div>
-                                ) : null}
+                                  <p>{getStaffLabel(appointment)}</p>
+                                </div>
+
+                                <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)]">
+                                  <div className="mb-1 flex items-center gap-2 text-[var(--text-primary)]">
+                                    <CreditCard className="h-4 w-4" />
+                                    <span className="font-medium">Payment mode</span>
+                                  </div>
+                                  <p>{getPaymentModeLabel(appointment)}</p>
+                                </div>
+
+                                <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)] sm:col-span-2">
+                                  <div className="mb-1 flex items-center gap-2 text-[var(--text-primary)]">
+                                    <MapPin className="h-4 w-4" />
+                                    <span className="font-medium">Address</span>
+                                  </div>
+                                  <p>{getAddressLabel(appointment)}</p>
+                                </div>
                               </div>
+
+                              {appointment.notes ? (
+                                <div className="mt-4 rounded-[1rem] border border-[var(--border-soft)] bg-white px-3 py-3 text-sm text-[var(--text-secondary)]">
+                                  <p className="mb-1 font-medium text-[var(--text-primary)]">
+                                    Notes
+                                  </p>
+                                  <p>{appointment.notes}</p>
+                                </div>
+                              ) : null}
                             </div>
 
-                            <div className="flex flex-wrap gap-2">
-                              <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                                Payment: {String(appointment.paymentStatus)}
+                            <div className="flex flex-wrap gap-2 lg:w-[220px] lg:justify-end">
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm">
+                                <Receipt className="h-3.5 w-3.5" />
+                                {getPaymentModeLabel(appointment)}
                               </span>
-                              <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                                Fee: ₹ {appointment.visitFee}
+
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm">
+                                <IndianRupee className="h-3.5 w-3.5" />
+                                {appointment.visitFee}
                               </span>
                             </div>
                           </div>
 
                           {allowManage ? (
-                            <div className="mt-4 grid gap-3 border-t border-[var(--border-soft)] pt-4 lg:grid-cols-2">
-                              <div className="grid gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                            <div className="mt-5 grid gap-3 border-t border-[var(--border-soft)] pt-5 xl:grid-cols-2">
+                              <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white p-3">
+                                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-secondary)]">
                                   Assign staff
                                 </label>
-                                <div className="flex flex-col gap-2 sm:flex-row">
+
+                                <div className="flex flex-col gap-2">
                                   <select
                                     value={
                                       assignDrafts[appointment._id] ??
@@ -469,7 +517,7 @@ export function AppointmentCalendar({
                                         [appointment._id]: e.target.value,
                                       }))
                                     }
-                                    className="flex-1"
+                                    className={selectClassName}
                                   >
                                     <option value="">Select staff</option>
                                     {staffOptions.map((staff) => (
@@ -495,11 +543,12 @@ export function AppointmentCalendar({
                                 </div>
                               </div>
 
-                              <div className="grid gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-secondary)]">
-                                  Update status
+                              <div className="rounded-[1rem] border border-[var(--border-soft)] bg-white p-3">
+                                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                                  Appointment status
                                 </label>
-                                <div className="flex flex-col gap-2 sm:flex-row">
+
+                                <div className="flex flex-col gap-2">
                                   <select
                                     value={
                                       statusDrafts[appointment._id] ??
@@ -511,7 +560,7 @@ export function AppointmentCalendar({
                                         [appointment._id]: e.target.value,
                                       }))
                                     }
-                                    className="flex-1"
+                                    className={selectClassName}
                                   >
                                     {STATUS_OPTIONS.map((status) => (
                                       <option key={status} value={status}>

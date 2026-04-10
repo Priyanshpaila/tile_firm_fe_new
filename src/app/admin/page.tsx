@@ -50,20 +50,20 @@ export default function AdminPage() {
         onChange={admin.setActiveTab}
       >
         <div className="grid gap-6">
-          {admin.activeTab === "overview" ? (
+          <section hidden={admin.activeTab !== "overview"}>
             <AdminOverviewTab
               stats={admin.stats}
               statsItems={admin.statsItems}
               loading={admin.loadingDashboard}
               error={admin.dashboardError}
             />
-          ) : null}
+          </section>
 
-          {admin.activeTab === "appointments" ? (
+          <section hidden={admin.activeTab !== "appointments"}>
             <AdminAppointmentsTab />
-          ) : null}
+          </section>
 
-          {admin.activeTab === "products" ? (
+          <section hidden={admin.activeTab !== "products"}>
             <AdminProductsTab
               products={admin.products}
               categories={admin.categories}
@@ -90,9 +90,9 @@ export default function AdminPage() {
               onPrevPage={() => void admin.loadProducts(admin.productPage - 1)}
               onNextPage={() => void admin.loadProducts(admin.productPage + 1)}
             />
-          ) : null}
+          </section>
 
-          {admin.activeTab === "categories" ? (
+          <section hidden={admin.activeTab !== "categories"}>
             <AdminCategoriesTab
               categories={admin.categories}
               loading={admin.loadingCategories}
@@ -104,9 +104,9 @@ export default function AdminPage() {
                 void admin.handleDeleteCategory(category)
               }
             />
-          ) : null}
+          </section>
 
-          {admin.activeTab === "staff" ? (
+          <section hidden={admin.activeTab !== "staff"}>
             <AdminStaffTab
               staffList={admin.staffList}
               loading={admin.loadingStaff}
@@ -117,16 +117,16 @@ export default function AdminPage() {
               staffCredentialNotice={admin.staffCredentialNotice}
               onClearCredentialNotice={admin.clearStaffCredentialNotice}
             />
-          ) : null}
+          </section>
 
-          {admin.activeTab === "users" ? (
+          <section hidden={admin.activeTab !== "users"}>
             <AdminUsersTab
               users={admin.users}
               loading={admin.loadingUsers}
               error={admin.usersError}
               onToggleUser={(userId) => void admin.handleToggleUser(userId)}
             />
-          ) : null}
+          </section>
         </div>
 
         <ProductModal

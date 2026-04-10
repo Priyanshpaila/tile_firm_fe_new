@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { endOfMonth, endOfWeek, format, startOfMonth, startOfWeek } from "date-fns";
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
 import { api } from "@/lib/api";
 import type { Appointment, Staff } from "@/types";
 import { AppointmentCalendar } from "@/components/ui/appointment-calendar";
@@ -33,6 +39,7 @@ export function AdminAppointmentsTab() {
 
   const loadStaff = useCallback(async () => {
     setStaffLoading(true);
+
     try {
       const res = await api.staff.list();
       setStaffList(res.data.staff || []);
@@ -52,7 +59,9 @@ export function AdminAppointmentsTab() {
       const res = await api.appointments.calendar(range);
       setAppointments(res.data.appointments || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load appointments.");
+      setError(
+        err instanceof Error ? err.message : "Failed to load appointments.",
+      );
     } finally {
       setLoading(false);
     }
@@ -68,7 +77,10 @@ export function AdminAppointmentsTab() {
     await loadAppointments(currentRange);
   };
 
-  const handleUpdateStatus = async (appointmentId: string, status: string) => {
+  const handleUpdateStatus = async (
+    appointmentId: string,
+    status: string,
+  ) => {
     await api.appointments.updateStatus(appointmentId, status);
     await loadAppointments(currentRange);
   };
@@ -76,11 +88,11 @@ export function AdminAppointmentsTab() {
   return (
     <SectionCard
       title="Appointments"
-      description="Monthly appointment calendar for admin. Reload manually when needed."
+      description="Monthly appointment calendar for admin. Open a day to assign staff and manage appointment status."
     >
       <AppointmentCalendar
         title="Admin Appointments Calendar"
-        description="Each cell shows appointment count. Click a day to view details."
+        description="Click any day to view appointment details, assign staff, and update appointment flow."
         appointments={appointments}
         staffOptions={staffList}
         loading={loading || staffLoading}

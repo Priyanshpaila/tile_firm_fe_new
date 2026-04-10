@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
-  ArrowUpRight,
   BookOpen,
-  CalendarDays,
   ChevronRight,
   Home,
   Layers3,
@@ -17,9 +14,7 @@ import {
   Menu,
   Phone,
   ShoppingBag,
-  Sparkles,
   UserCircle2,
-  X,
 } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ROUTES, roleHome } from "@/lib/routes";
@@ -128,7 +123,11 @@ export function DashboardShell<T extends string>({
 
   const userName =
     user?.name ||
-    (role === "admin" ? "Admin User" : role === "staff" ? "Staff User" : "Dashboard User");
+    (role === "admin"
+      ? "Admin User"
+      : role === "staff"
+        ? "Staff User"
+        : "Dashboard User");
 
   const userEmail = user?.email || "";
 
@@ -177,7 +176,7 @@ export function DashboardShell<T extends string>({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3 py-4">
         <div className="mb-5">
           <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/38">
             Website Navigation
@@ -376,23 +375,8 @@ export function DashboardShell<T extends string>({
             </div>
           </header>
 
-          <main className="min-h-0 flex-1 overflow-y-auto">
+          <main className="no-scrollbar min-h-0 flex-1 overflow-y-auto">
             <div className="mx-auto w-full max-w-7xl px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
-              <div className="mb-6 rounded-[1.6rem] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#1a1511_0%,#2b2119_55%,#5b3d24_100%)] p-5 text-white shadow-[0_18px_50px_rgba(20,16,10,0.12)] md:p-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/52">
-                  {meta.eyebrow}
-                </p>
-                <h2 className="mt-2 text-[1.9rem] font-semibold tracking-[-0.05em] md:text-[2.2rem]">
-                  {title}
-                </h2>
-                <p className="mt-2 max-w-3xl text-sm leading-7 text-white/78 md:text-[15px]">
-                  {description}
-                </p>
-                <div className="mt-4 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/80">
-                  Logged in as {userEmail || userName}
-                </div>
-              </div>
-
               {children}
             </div>
           </main>

@@ -5,21 +5,24 @@ import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 
-const DASHBOARD_PREFIXES = [
+const APP_ROUTES_WITHOUT_SITE_CHROME = [
   "/dashboard",
   "/user-dashboard",
   "/admin-dashboard",
   "/staff-dashboard",
+  "/admin",
+  "/staff",
+  "/user",
 ];
 
 export function AppChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  const isDashboardRoute = DASHBOARD_PREFIXES.some(
+  const hideSiteChrome = APP_ROUTES_WITHOUT_SITE_CHROME.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  if (isDashboardRoute) {
+  if (hideSiteChrome) {
     return <>{children}</>;
   }
 

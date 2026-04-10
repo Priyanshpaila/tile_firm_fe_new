@@ -41,7 +41,7 @@ export default function UserDashboardPage() {
         onChange={dashboard.setActiveTab}
       >
         <div className="grid gap-6">
-          {dashboard.activeTab === "overview" ? (
+          <section hidden={dashboard.activeTab !== "overview"}>
             <UserOverviewTab
               user={dashboard.user}
               loading={dashboard.loadingOverview}
@@ -50,29 +50,29 @@ export default function UserDashboardPage() {
               upcomingAppointment={dashboard.upcomingAppointment}
               recentVisualization={dashboard.recentVisualization}
             />
-          ) : null}
+          </section>
 
-          {dashboard.activeTab === "appointments" ? (
+          <section hidden={dashboard.activeTab !== "appointments"}>
             <UserAppointmentsTab />
-          ) : null}
+          </section>
 
-          {dashboard.activeTab === "wishlist" ? (
+          <section hidden={dashboard.activeTab !== "wishlist"}>
             <UserWishlistTab
               loading={dashboard.loadingWishlist}
               error={dashboard.error}
               wishlist={dashboard.wishlist}
               onRefresh={() => void dashboard.loadWishlist()}
             />
-          ) : null}
+          </section>
 
-          {dashboard.activeTab === "visualizations" ? (
+          <section hidden={dashboard.activeTab !== "visualizations"}>
             <UserVisualizationsTab
               loading={dashboard.loadingVisualizations}
               error={dashboard.error}
               visualizations={dashboard.visualizations}
               onRefresh={() => void dashboard.loadVisualizations()}
             />
-          ) : null}
+          </section>
         </div>
       </DashboardShell>
     </AuthGuard>
