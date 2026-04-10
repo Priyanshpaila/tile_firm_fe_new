@@ -1,29 +1,46 @@
 "use client";
 
+import {
+  CalendarDays,
+  Heart,
+  LayoutGrid,
+  Layers3,
+} from "lucide-react";
 import { AuthGuard } from "@/components/layout/auth-guard";
-import { PageShell } from "@/components/layout/page-shell";
-import { UserTabs } from "./_components/user-tabs";
+import {
+  DashboardShell,
+  type DashboardTabDefinition,
+} from "@/components/dashboard/dashboard-shell";
 import { UserOverviewTab } from "./_components/user-overview-tab";
 import { UserAppointmentsTab } from "./_components/user-appointments-tab";
 import { UserWishlistTab } from "./_components/user-wishlist-tab";
 import { UserVisualizationsTab } from "./_components/user-visualizations-tab";
-import { useUserDashboard } from "./_hooks/use-user-dashboard";
+import {
+  useUserDashboard,
+  type UserDashboardTab,
+} from "./_hooks/use-user-dashboard";
+
+const tabs: DashboardTabDefinition<UserDashboardTab>[] = [
+  { key: "overview", label: "Overview", icon: LayoutGrid },
+  { key: "appointments", label: "Appointments", icon: CalendarDays },
+  { key: "wishlist", label: "Wishlist", icon: Heart },
+  { key: "visualizations", label: "Saved Views", icon: Layers3 },
+];
 
 export default function UserDashboardPage() {
   const dashboard = useUserDashboard();
 
   return (
     <AuthGuard roles={["user"]}>
-      <PageShell
+      <DashboardShell
+        role="user"
         title="My Dashboard"
-        description="Manage your appointments, wishlist, saved room previews, and account activity."
+        description="Manage your appointments, wishlist, upcoming appointments, and saved room previews from one place."
+        tabs={tabs}
+        activeTab={dashboard.activeTab}
+        onChange={dashboard.setActiveTab}
       >
         <div className="grid gap-6">
-          <UserTabs
-            activeTab={dashboard.activeTab}
-            onChange={dashboard.setActiveTab}
-          />
-
           {dashboard.activeTab === "overview" ? (
             <UserOverviewTab
               user={dashboard.user}
@@ -57,7 +74,7 @@ export default function UserDashboardPage() {
             />
           ) : null}
         </div>
-      </PageShell>
+      </DashboardShell>
     </AuthGuard>
   );
 }

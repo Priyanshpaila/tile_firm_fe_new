@@ -1,8 +1,22 @@
 "use client";
 
+import {
+  Boxes,
+  CalendarDays,
+  LayoutGrid,
+  Layers3,
+  ShieldCheck,
+  Users2,
+} from "lucide-react";
 import { AuthGuard } from "@/components/layout/auth-guard";
-import { PageShell } from "@/components/layout/page-shell";
-import { AdminTabs } from "./_components/admin-tabs";
+import {
+  DashboardShell,
+  type DashboardTabDefinition,
+} from "@/components/dashboard/dashboard-shell";
+import {
+  useAdminDashboard,
+  type AdminTabKey,
+} from "./_hooks/use-admin-dashboard";
 import { AdminOverviewTab } from "./_components/admin-overview-tab";
 import { AdminProductsTab } from "./_components/admin-products-tab";
 import { AdminCategoriesTab } from "./_components/admin-categories-tab";
@@ -11,24 +25,31 @@ import { AdminUsersTab } from "./_components/admin-users-tab";
 import { ProductModal } from "./_components/product-modal";
 import { CategoryModal } from "./_components/category-modal";
 import { StaffModal } from "./_components/staff-modal";
-import { useAdminDashboard } from "./_hooks/use-admin-dashboard";
 import { AdminAppointmentsTab } from "./_components/admin-appointments-tab";
+
+const tabs: DashboardTabDefinition<AdminTabKey>[] = [
+  { key: "overview", label: "Overview", icon: LayoutGrid },
+  { key: "appointments", label: "Appointments", icon: CalendarDays },
+  { key: "products", label: "Products", icon: Boxes },
+  { key: "categories", label: "Categories", icon: Layers3 },
+  { key: "staff", label: "Staff", icon: ShieldCheck },
+  { key: "users", label: "Users", icon: Users2 },
+];
 
 export default function AdminPage() {
   const admin = useAdminDashboard();
 
   return (
     <AuthGuard roles={["admin"]}>
-      <PageShell
+      <DashboardShell
+        role="admin"
         title="Admin Dashboard"
-        description="Admin control panel with overview, products, categories, staff, and users."
+        description="Admin control panel with overview, products, categories, staff, appointments, and users."
+        tabs={tabs}
+        activeTab={admin.activeTab}
+        onChange={admin.setActiveTab}
       >
         <div className="grid gap-6">
-          <AdminTabs
-            activeTab={admin.activeTab}
-            onChange={admin.setActiveTab}
-          />
-
           {admin.activeTab === "overview" ? (
             <AdminOverviewTab
               stats={admin.stats}
@@ -38,7 +59,9 @@ export default function AdminPage() {
             />
           ) : null}
 
-          {admin.activeTab === "appointments" ? <AdminAppointmentsTab /> : null}
+          {admin.activeTab === "appointments" ? (
+            <AdminAppointmentsTab />
+          ) : null}
 
           {admin.activeTab === "products" ? (
             <AdminProductsTab
@@ -139,7 +162,7 @@ export default function AdminPage() {
           onClose={admin.closeStaffModal}
           onSubmit={admin.handleSubmitStaff}
         />
-      </PageShell>
+      </DashboardShell>
     </AuthGuard>
   );
 }

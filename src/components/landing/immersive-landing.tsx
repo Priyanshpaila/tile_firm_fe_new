@@ -4,7 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Quote,
+  Star,
+} from "lucide-react";
 import { ROUTES } from "@/lib/routes";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -42,6 +49,13 @@ type TileCategoryProduct = {
   href: string;
 };
 
+type TestimonialItem = {
+  text: string;
+  image: string;
+  name: string;
+  role: string;
+};
+
 const heroImage =
   "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=2200&q=80";
 
@@ -70,7 +84,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹68 / sq.ft",
     tag: "Best Seller",
     image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1616594039964-3c8c2d2e6d4b?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
   {
@@ -80,7 +94,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹74 / sq.ft",
     tag: "Premium Look",
     image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
   {
@@ -90,7 +104,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹42 / sq.ft",
     tag: "Top Rated",
     image:
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
   {
@@ -100,7 +114,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹81 / sq.ft",
     tag: "Outdoor",
     image:
-      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
   {
@@ -110,7 +124,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹49 / sq.ft",
     tag: "Functional",
     image:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
   {
@@ -120,7 +134,7 @@ const featuredCollections: TileCollectionItem[] = [
     priceLabel: "From ₹58 / sq.ft",
     tag: "Heavy Duty",
     image:
-      "https://images.unsplash.com/photo-1519642918688-7e43b19245d8?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1519642918688-7e43b19245d8?auto=format&fit=crop&w=1000&q=80",
     href: ROUTES.catalog,
   },
 ];
@@ -139,7 +153,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Glossy · 600×1200 mm",
     priceLabel: "From ₹72 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1616594039964-3c8c2d2e6d4b?auto=format&fit=crop&w=1000&q=80",
     categoryId: "living-room",
     href: ROUTES.catalog,
   },
@@ -149,7 +163,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Matt · 200×1200 mm",
     priceLabel: "From ₹79 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1000&q=80",
     categoryId: "living-room",
     href: ROUTES.catalog,
   },
@@ -159,7 +173,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Safe Grip · 300×300 mm",
     priceLabel: "From ₹46 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=1000&q=80",
     categoryId: "bathroom",
     href: ROUTES.catalog,
   },
@@ -169,7 +183,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Clean Finish · 300×600 mm",
     priceLabel: "From ₹39 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1000&q=80",
     categoryId: "bathroom",
     href: ROUTES.catalog,
   },
@@ -179,7 +193,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Backsplash · 75×300 mm",
     priceLabel: "From ₹44 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80",
     categoryId: "kitchen",
     href: ROUTES.catalog,
   },
@@ -189,7 +203,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Low Maintenance · 600×600 mm",
     priceLabel: "From ₹62 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1000&q=80",
     categoryId: "kitchen",
     href: ROUTES.catalog,
   },
@@ -199,7 +213,7 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Durable · Exterior Grade",
     priceLabel: "From ₹57 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1519642918688-7e43b19245d8?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1519642918688-7e43b19245d8?auto=format&fit=crop&w=1000&q=80",
     categoryId: "outdoor",
     href: ROUTES.catalog,
   },
@@ -209,9 +223,75 @@ const categoryProducts: TileCategoryProduct[] = [
     subtitle: "Anti-Slip · Open Areas",
     priceLabel: "From ₹66 / sq.ft",
     image:
-      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1000&q=80",
     categoryId: "outdoor",
     href: ROUTES.catalog,
+  },
+];
+
+const testimonials: TestimonialItem[] = [
+  {
+    text: "The visualizer helped us shortlist the exact beige marble finish for our living room before ordering. It made the whole tile selection process much easier.",
+    image:
+      "https://randomuser.me/api/portraits/women/12.jpg",
+    name: "Neha Sharma",
+    role: "Homeowner",
+  },
+  {
+    text: "We compared multiple bathroom anti-skid options and finalised faster than expected. The consultation team explained finish, size, and maintenance very clearly.",
+    image:
+      "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "Arjun Mehta",
+    role: "Residential Client",
+  },
+  {
+    text: "The catalog feels premium and the tile ranges are easy to understand. We used it to choose wall tiles for a kitchen renovation and it saved us a lot of time.",
+    image:
+      "https://randomuser.me/api/portraits/women/44.jpg",
+    name: "Priya Nair",
+    role: "Interior Stylist",
+  },
+  {
+    text: "From product browsing to room preview, the experience felt very smooth. It gave our clients more confidence before finalizing tile combinations.",
+    image:
+      "https://randomuser.me/api/portraits/men/41.jpg",
+    name: "Rohit Jain",
+    role: "Architect",
+  },
+  {
+    text: "We were able to review outdoor and parking tile options in one place. The product presentation and finishes were much more helpful than a normal catalog sheet.",
+    image:
+      "https://randomuser.me/api/portraits/men/56.jpg",
+    name: "Siddharth Verma",
+    role: "Builder",
+  },
+  {
+    text: "The premium look of the collections and the consultation support made the final decision easy for our bathroom and kitchen renovation project.",
+    image:
+      "https://randomuser.me/api/portraits/women/36.jpg",
+    name: "Kavya Iyer",
+    role: "Home Renovation Client",
+  },
+  {
+    text: "Being able to compare tile categories quickly was the best part. We shortlisted living room and feature wall tiles without visiting multiple stores.",
+    image:
+      "https://randomuser.me/api/portraits/women/24.jpg",
+    name: "Aditi Kapoor",
+    role: "Apartment Owner",
+  },
+  {
+    text: "The consultation flow is well thought out. It helped us select a durable exterior tile with the right tone and finish for our project site.",
+    image:
+      "https://randomuser.me/api/portraits/men/18.jpg",
+    name: "Vivek Rao",
+    role: "Contractor",
+  },
+  {
+    text: "The room-preview approach makes a real difference. It feels modern, practical, and much more trustworthy than choosing from flat swatches alone.",
+    image:
+      "https://randomuser.me/api/portraits/women/52.jpg",
+    name: "Ritika Malhotra",
+    role: "Design Consultant",
   },
 ];
 
@@ -261,6 +341,76 @@ function TileCard({
   );
 }
 
+function TestimonialsColumn({
+  className,
+  items,
+  duration = 16,
+}: {
+  className?: string;
+  items: TestimonialItem[];
+  duration?: number;
+}) {
+  return (
+    <div className={className}>
+      <motion.div
+        animate={{ translateY: "-50%" }}
+        transition={{
+          duration,
+          repeat: Infinity,
+          ease: "linear",
+          repeatType: "loop",
+        }}
+        className="flex flex-col gap-4 pb-4"
+      >
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div key={index} className="flex flex-col gap-4">
+            {items.map((item, i) => (
+              <div
+                key={`${item.name}-${i}-${index}`}
+                className="rounded-[1.45rem] border border-black/6 bg-[#efebe6] p-5 shadow-[0_16px_34px_rgba(20,16,10,0.05)]"
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[#a9743c]">
+                    <Star size={14} fill="currentColor" />
+                    <Star size={14} fill="currentColor" />
+                    <Star size={14} fill="currentColor" />
+                    <Star size={14} fill="currentColor" />
+                    <Star size={14} fill="currentColor" />
+                  </div>
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#a9743c] shadow-sm">
+                    <Quote size={16} />
+                  </div>
+                </div>
+
+                <p className="text-[15px] leading-7 text-[#3e342c]">
+                  {item.text}
+                </p>
+
+                <div className="mt-5 flex items-center gap-3">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-11 w-11 rounded-full object-cover"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-[#1e1a17]">
+                      {item.name}
+                    </p>
+                    <p className="text-sm text-[#6f655a]">{item.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
 export function ImmersiveLanding() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -278,6 +428,10 @@ export function ImmersiveLanding() {
       (item) => item.categoryId === activeCategoryId,
     );
   }, [activeCategoryId]);
+
+  const firstColumn = testimonials.slice(0, 3);
+  const secondColumn = testimonials.slice(3, 6);
+  const thirdColumn = testimonials.slice(6, 9);
 
   useEffect(() => {
     let cleanupParallax: (() => void) | undefined;
@@ -668,6 +822,52 @@ export function ImmersiveLanding() {
             View Full Catalog
             <ArrowRight size={16} />
           </Link>
+        </div>
+      </section>
+
+      <section id="testimonials" className="pb-12 md:pb-16">
+        <div className={shell}>
+          <div
+            data-reveal
+            className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between"
+          >
+            <div>
+              <p className="mb-2 text-sm font-medium uppercase tracking-[0.22em] text-[#7a6d61]">
+                Trusted Experience
+              </p>
+              <h2 className="text-[clamp(2rem,3vw,3.7rem)] font-semibold tracking-[-0.06em] text-[#151210]">
+                What customers say
+              </h2>
+            </div>
+
+            <p className="max-w-[30rem] text-sm leading-7 text-[#6f655a]">
+              Homeowners, designers, and project teams use SquareFoot to
+              explore collections, compare finishes, and choose tiles with more
+              confidence.
+            </p>
+          </div>
+
+          <div
+            data-reveal
+            className="relative overflow-hidden rounded-[2rem] border border-black/6 bg-[#f1ece5] p-4 md:p-6"
+          >
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-[linear-gradient(180deg,#f1ece5_0%,rgba(241,236,229,0)_100%)]" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-[linear-gradient(0deg,#f1ece5_0%,rgba(241,236,229,0)_100%)]" />
+
+            <div className="flex max-h-[760px] justify-center gap-4 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] md:gap-5">
+              <TestimonialsColumn items={firstColumn} duration={15} />
+              <TestimonialsColumn
+                items={secondColumn}
+                duration={18}
+                className="hidden md:block"
+              />
+              <TestimonialsColumn
+                items={thirdColumn}
+                duration={16}
+                className="hidden xl:block"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
