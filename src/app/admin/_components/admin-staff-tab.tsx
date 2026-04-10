@@ -1,3 +1,5 @@
+"use client";
+
 import { Loader } from "@/components/ui/loader";
 import type { Staff } from "@/types";
 import { SectionCard } from "./section-card";
@@ -21,6 +23,18 @@ type StaffCredentialNotice = {
   temporaryPassword?: string;
 } | null;
 
+function TableShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-[1.2rem] border border-[var(--border-soft)] bg-white shadow-[0_10px_30px_rgba(20,16,10,0.04)]">
+      <div className="overflow-x-auto">{children}</div>
+    </div>
+  );
+}
+
 export function AdminStaffTab({
   staffList,
   loading,
@@ -43,9 +57,9 @@ export function AdminStaffTab({
   return (
     <SectionCard
       title="Staff Management"
-      description="Team records with assignment status and linked login-account visibility."
+      description="Compact team table with linked account and service visibility."
       actions={
-        <div className="grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={onRefresh}
             className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
@@ -105,87 +119,103 @@ export function AdminStaffTab({
       {loading ? (
         <Loader label="Loading staff..." />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-          {staffList.map((staff) => {
-            const item = staff as LooseStaff;
-            const hasLogin = !!item.userAccount;
+        <TableShell>
+          <table className="min-w-[1180px] w-full text-sm">
+            <thead className="bg-[#faf7f2] text-left text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+              <tr>
+                <th className="px-4 py-3 font-medium">Staff</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Availability</th>
+                <th className="px-4 py-3 font-medium">Login Account</th>
+                <th className="px-4 py-3 font-medium">Service Areas</th>
+                <th className="px-4 py-3 font-medium">Notes</th>
+                <th className="px-4 py-3 font-medium">Action</th>
+              </tr>
+            </thead>
 
-            return (
-              <article
-                key={staff._id}
-                className="rounded-[1.4rem] border border-[var(--border-soft)] bg-white p-4 shadow-[0_10px_30px_rgba(20,16,10,0.04)] sm:p-5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
-                      {item.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                      {item.phone || "No phone"}
-                    </p>
-                    {item.email ? (
-                      <p className="mt-1 break-all text-sm text-[var(--text-secondary)]">
-                        {item.email}
-                      </p>
-                    ) : null}
-                  </div>
+            <tbody>
+              {staffList.map((staff) => {
+                const item = staff as LooseStaff;
+                const hasLogin = !!item.userAccount;
 
-                  <span
-                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                      item.isAvailable === false
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
+                return (
+                  <tr
+                    key={staff._id}
+                    className="border-t border-[var(--border-soft)] align-top transition hover:bg-[#fcfbf8]"
                   >
-                    {item.isAvailable === false ? "Unavailable" : "Available"}
-                  </span>
-                </div>
+                    <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
+                      {item.name}
+                    </td>
 
-                <div className="mt-4 grid gap-3 rounded-[1rem] bg-[#faf7f2] p-3 text-sm">
-                  <div>
-                    <p className="text-[var(--text-secondary)]">Login Account</p>
-                    <p className="mt-1 font-medium text-[var(--text-primary)]">
-                      {hasLogin ? "Linked" : "Not linked"}
-                    </p>
-                    {item.userAccount?.email ? (
-                      <p className="mt-1 break-all text-xs text-[var(--text-secondary)]">
-                        {item.userAccount.email}
-                      </p>
-                    ) : null}
-                  </div>
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {item.phone || "—"}
+                    </td>
 
-                  <div>
-                    <p className="text-[var(--text-secondary)]">Service Areas</p>
-                    <p className="mt-1 font-medium text-[var(--text-primary)]">
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {item.email || "—"}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          item.isAvailable === false
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {item.isAvailable === false ? "Unavailable" : "Available"}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      <div>
+                        <p className="font-medium text-[var(--text-primary)]">
+                          {hasLogin ? "Linked" : "Not linked"}
+                        </p>
+                        <p className="mt-1 text-xs">
+                          {item.userAccount?.email || "—"}
+                        </p>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
                       {item.serviceAreas?.length
                         ? item.serviceAreas.join(", ")
-                        : "No service areas added"}
-                    </p>
-                  </div>
-                </div>
+                        : "No service areas"}
+                    </td>
 
-                <div className="mt-4 rounded-[1rem] bg-[#faf7f2] p-3 text-sm text-[var(--text-secondary)]">
-                  {item.notes || "No internal notes added for this staff member."}
-                </div>
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      <p className="max-w-[260px] leading-6">
+                        {item.notes || "No internal notes."}
+                      </p>
+                    </td>
 
-                <div className="mt-5">
-                  <button
-                    onClick={() => onEditStaff(staff)}
-                    className="w-full rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => onEditStaff(staff)}
+                        className="rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-xs font-medium text-[var(--text-primary)]"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {!staffList.length ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-4 py-10 text-center text-sm text-[var(--text-secondary)]"
                   >
-                    Edit Staff
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-
-          {!staffList.length ? (
-            <div className="rounded-[1.3rem] border border-[var(--border-soft)] bg-white px-4 py-10 text-center text-sm text-[var(--text-secondary)] sm:col-span-2 2xl:col-span-3">
-              No staff found.
-            </div>
-          ) : null}
-        </div>
+                    No staff found.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </TableShell>
       )}
     </SectionCard>
   );

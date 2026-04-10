@@ -77,10 +77,7 @@ export function AdminAppointmentsTab() {
     await loadAppointments(currentRange);
   };
 
-  const handleUpdateStatus = async (
-    appointmentId: string,
-    status: string,
-  ) => {
+  const handleUpdateStatus = async (appointmentId: string, status: string) => {
     await api.appointments.updateStatus(appointmentId, status);
     await loadAppointments(currentRange);
   };
@@ -88,11 +85,11 @@ export function AdminAppointmentsTab() {
   return (
     <SectionCard
       title="Appointments"
-      description="Monthly appointment calendar for admin. Open a day to assign staff and manage appointment status."
+      description="Calendar plus compact appointment table for faster daily admin management."
     >
       <AppointmentCalendar
         title="Admin Appointments Calendar"
-        description="Click any day to view appointment details, assign staff, and update appointment flow."
+        description="Use the calendar for date selection and the table below for faster scanning."
         appointments={appointments}
         staffOptions={staffList}
         loading={loading || staffLoading}

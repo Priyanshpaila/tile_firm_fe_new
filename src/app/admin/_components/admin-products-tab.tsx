@@ -1,3 +1,6 @@
+"use client";
+
+import type { ReactNode } from "react";
 import type { Category, Product } from "@/types";
 import { Loader } from "@/components/ui/loader";
 import { SectionCard } from "./section-card";
@@ -14,15 +17,27 @@ function FilterField({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--text-secondary)]">
+      <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-secondary)]">
         {label}
       </span>
       {children}
     </label>
+  );
+}
+
+function TableShell({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-[1.2rem] border border-[var(--border-soft)] bg-white shadow-[0_10px_30px_rgba(20,16,10,0.04)]">
+      <div className="overflow-x-auto">{children}</div>
+    </div>
   );
 }
 
@@ -76,9 +91,9 @@ export function AdminProductsTab({
   return (
     <SectionCard
       title="Product Management"
-      description="A responsive catalog control panel for tile products. No tables, no horizontal scroll."
+      description="Compact catalog table for faster admin operations."
       actions={
-        <div className="grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={onRefresh}
             className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
@@ -87,14 +102,14 @@ export function AdminProductsTab({
           </button>
           <button
             onClick={onCreateProduct}
-            className="rounded-full bg-[linear-gradient(135deg,#171411_0%,#2c241d_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(20,16,10,0.16)]"
+            className="rounded-full bg-[linear-gradient(135deg,#171411_0%,#2c241d_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(20,16,10,0.14)]"
           >
             Add Product
           </button>
         </div>
       }
     >
-      <div className="rounded-[1.35rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4 sm:p-5">
+      <div className="rounded-[1.2rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FilterField label="Search">
             <input
@@ -141,7 +156,7 @@ export function AdminProductsTab({
           </FilterField>
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={onApplyFilters}
             className="rounded-full bg-[var(--text-primary)] px-4 py-2.5 text-sm font-semibold text-white"
@@ -168,118 +183,134 @@ export function AdminProductsTab({
         {loading ? (
           <Loader label="Loading products..." />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-            {products.map((product) => (
-              <article
-                key={product._id}
-                className="overflow-hidden rounded-[1.4rem] border border-[var(--border-soft)] bg-white shadow-[0_10px_30px_rgba(20,16,10,0.04)]"
-              >
-                <div className="aspect-[16/10] overflow-hidden bg-[#f6f2eb]">
-                  <img
-                    src={product.images?.[0] || "/placeholder.png"}
-                    alt={product.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+          <TableShell>
+            <table className="min-w-[1180px] w-full text-sm">
+              <thead className="bg-[#faf7f2] text-left text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Product</th>
+                  <th className="px-4 py-3 font-medium">SKU</th>
+                  <th className="px-4 py-3 font-medium">Category</th>
+                  <th className="px-4 py-3 font-medium">Price</th>
+                  <th className="px-4 py-3 font-medium">Material</th>
+                  <th className="px-4 py-3 font-medium">Sizes</th>
+                  <th className="px-4 py-3 font-medium">Stock</th>
+                  <th className="px-4 py-3 font-medium">Featured</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
 
-                <div className="p-4 sm:p-5">
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        product.inStock
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {product.inStock ? "In stock" : "Out of stock"}
-                    </span>
+              <tbody>
+                {products.map((product) => (
+                  <tr
+                    key={product._id}
+                    className="border-t border-[var(--border-soft)] align-top transition hover:bg-[#fcfbf8]"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-[260px] items-start gap-3">
+                        <img
+                          src={product.images?.[0] || "/placeholder.png"}
+                          alt={product.name}
+                          className="h-12 w-12 rounded-xl object-cover bg-[#f6f2eb]"
+                        />
+                        <div className="min-w-0">
+                          <p className="font-medium text-[var(--text-primary)]">
+                            {product.name}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--text-secondary)]">
+                            {product.description || "No description"}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
 
-                    {product.isFeatured ? (
-                      <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
-                        Featured
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {product.sku || "—"}
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {typeof product.category === "string"
+                        ? product.category
+                        : product.category?.name || "—"}
+                    </td>
+
+                    <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
+                      ₹ {product.price}
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {product.material || "—"}
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {(product.sizes || []).join(", ") || "—"}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          product.inStock
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {product.inStock ? "In stock" : "Out of stock"}
                       </span>
-                    ) : null}
-                  </div>
+                    </td>
 
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
-                      {product.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                      {product.sku}
-                    </p>
-                  </div>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          product.isFeatured
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-[#f3eee6] text-[#5b5148]"
+                        }`}
+                      >
+                        {product.isFeatured ? "Featured" : "No"}
+                      </span>
+                    </td>
 
-                  <div className="mt-4 grid gap-3 rounded-[1rem] bg-[#faf7f2] p-3 text-sm sm:grid-cols-2">
-                    <div>
-                      <p className="text-[var(--text-secondary)]">Category</p>
-                      <p className="mt-1 font-medium text-[var(--text-primary)]">
-                        {typeof product.category === "string"
-                          ? product.category
-                          : product.category?.name || "—"}
-                      </p>
-                    </div>
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-[170px] gap-2">
+                        <button
+                          onClick={() => onEditProduct(product)}
+                          className="rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-xs font-medium text-[var(--text-primary)]"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => onDeleteProduct(product)}
+                          className="rounded-full bg-red-600 px-3 py-2 text-xs font-semibold text-white"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
 
-                    <div>
-                      <p className="text-[var(--text-secondary)]">Price</p>
-                      <p className="mt-1 font-medium text-[var(--text-primary)]">
-                        ₹ {product.price}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-[var(--text-secondary)]">Material</p>
-                      <p className="mt-1 font-medium text-[var(--text-primary)]">
-                        {product.material || "—"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-[var(--text-secondary)]">Sizes</p>
-                      <p className="mt-1 font-medium text-[var(--text-primary)]">
-                        {(product.sizes || []).join(", ") || "—"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="mt-4 line-clamp-3 text-sm leading-6 text-[var(--text-secondary)]">
-                    {product.description}
-                  </p>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <button
-                      onClick={() => onEditProduct(product)}
-                      className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
+                {!products.length ? (
+                  <tr>
+                    <td
+                      colSpan={9}
+                      className="px-4 py-10 text-center text-sm text-[var(--text-secondary)]"
                     >
-                      Edit Product
-                    </button>
-                    <button
-                      onClick={() => onDeleteProduct(product)}
-                      className="rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-
-            {!products.length ? (
-              <div className="rounded-[1.3rem] border border-[var(--border-soft)] bg-white px-4 py-10 text-center text-sm text-[var(--text-secondary)] sm:col-span-2 2xl:col-span-3">
-                No products found for the current filters.
-              </div>
-            ) : null}
-          </div>
+                      No products found for the current filters.
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </TableShell>
         )}
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 rounded-[1.25rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mt-5 flex flex-col gap-3 rounded-[1.15rem] border border-[var(--border-soft)] bg-[#fcfbf8] p-4 lg:flex-row lg:items-center lg:justify-between">
         <p className="text-sm text-[var(--text-secondary)]">
           Showing page {productsPagination.page} of {productsPagination.pages} ·{" "}
           {productsPagination.total} total products
         </p>
 
-        <div className="grid grid-cols-2 gap-3 sm:flex">
+        <div className="flex flex-wrap gap-3">
           <button
             disabled={productPage <= 1 || loading}
             onClick={onPrevPage}

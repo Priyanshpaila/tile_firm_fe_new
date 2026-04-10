@@ -1,5 +1,7 @@
-import { Loader } from "@/components/ui/loader";
+"use client";
+
 import type { Category } from "@/types";
+import { Loader } from "@/components/ui/loader";
 import { SectionCard } from "./section-card";
 
 type LooseCategory = Category & {
@@ -8,6 +10,18 @@ type LooseCategory = Category & {
   image?: string;
   isActive?: boolean;
 };
+
+function TableShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-[1.2rem] border border-[var(--border-soft)] bg-white shadow-[0_10px_30px_rgba(20,16,10,0.04)]">
+      <div className="overflow-x-auto">{children}</div>
+    </div>
+  );
+}
 
 export function AdminCategoriesTab({
   categories,
@@ -29,9 +43,9 @@ export function AdminCategoriesTab({
   return (
     <SectionCard
       title="Category Management"
-      description="Responsive category cards with better hierarchy and actions."
+      description="Compact table layout for easier category administration."
       actions={
-        <div className="grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={onRefresh}
             className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
@@ -56,79 +70,102 @@ export function AdminCategoriesTab({
       {loading ? (
         <Loader label="Loading categories..." />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
-          {categories.map((category) => {
-            const item = category as LooseCategory;
+        <TableShell>
+          <table className="min-w-[980px] w-full text-sm">
+            <thead className="bg-[#faf7f2] text-left text-xs uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+              <tr>
+                <th className="px-4 py-3 font-medium">Category</th>
+                <th className="px-4 py-3 font-medium">Slug</th>
+                <th className="px-4 py-3 font-medium">Description</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
 
-            return (
-              <article
-                key={category._id}
-                className="overflow-hidden rounded-[1.4rem] border border-[var(--border-soft)] bg-white shadow-[0_10px_30px_rgba(20,16,10,0.04)]"
-              >
-                {item.image ? (
-                  <div className="aspect-[16/8] overflow-hidden bg-[#f6f2eb]">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-[16/8] bg-[linear-gradient(135deg,#f6f2eb_0%,#eee4d7_100%)]" />
-                )}
+            <tbody>
+              {categories.map((category) => {
+                const item = category as LooseCategory;
 
-                <div className="p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
-                        {item.name}
-                      </h3>
-                      <p className="mt-1 break-all text-sm text-[var(--text-secondary)]">
-                        {item.slug || "No slug"}
+                return (
+                  <tr
+                    key={category._id}
+                    className="border-t border-[var(--border-soft)] align-top transition hover:bg-[#fcfbf8]"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-[220px] items-start gap-3">
+                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-[#f6f2eb]">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : null}
+                        </div>
+                        <div>
+                          <p className="font-medium text-[var(--text-primary)]">
+                            {item.name}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      {item.slug || "—"}
+                    </td>
+
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">
+                      <p className="max-w-[380px] leading-6">
+                        {item.description || "No description added yet."}
                       </p>
-                    </div>
+                    </td>
 
-                    <span
-                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                        item.isActive === false
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {item.isActive === false ? "Inactive" : "Active"}
-                    </span>
-                  </div>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          item.isActive === false
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {item.isActive === false ? "Inactive" : "Active"}
+                      </span>
+                    </td>
 
-                  <p className="mt-4 min-h-[72px] text-sm leading-6 text-[var(--text-secondary)]">
-                    {item.description || "No description added yet."}
-                  </p>
+                    <td className="px-4 py-3">
+                      <div className="flex min-w-[160px] gap-2">
+                        <button
+                          onClick={() => onEditCategory(category)}
+                          className="rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-xs font-medium text-[var(--text-primary)]"
+                        >
+                          Edit
+                        </button>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <button
-                      onClick={() => onEditCategory(category)}
-                      className="rounded-full border border-[var(--border-soft)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-primary)]"
-                    >
-                      Edit Category
-                    </button>
+                        <button
+                          onClick={() => onDeleteCategory(category)}
+                          className="rounded-full bg-red-600 px-3 py-2 text-xs font-semibold text-white"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
 
-                    <button
-                      onClick={() => onDeleteCategory(category)}
-                      className="rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-
-          {!categories.length ? (
-            <div className="rounded-[1.3rem] border border-[var(--border-soft)] bg-white px-4 py-10 text-center text-sm text-[var(--text-secondary)] sm:col-span-2 2xl:col-span-3">
-              No categories found.
-            </div>
-          ) : null}
-        </div>
+              {!categories.length ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-10 text-center text-sm text-[var(--text-secondary)]"
+                  >
+                    No categories found.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </TableShell>
       )}
     </SectionCard>
   );
