@@ -160,13 +160,13 @@ export function DashboardShell<T extends string>({
           <p className="text-sm leading-6 text-white/68">{meta.description}</p>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <Link
+        <div className="mt-4 grid grid-cols-1 gap-2">
+          {/* <Link
             href={ROUTES.home}
             className="inline-flex h-11 items-center justify-center rounded-full border border-white/10 bg-white/6 px-4 text-sm font-semibold text-white transition hover:bg-white/10"
           >
             Landing Page
-          </Link>
+          </Link> */}
           <Link
             href={ROUTES.booking}
             className="inline-flex h-11 items-center justify-center rounded-full bg-[#a9743c] px-4 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(169,116,60,0.22)] transition hover:bg-[#95632f]"
