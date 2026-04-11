@@ -80,7 +80,7 @@ export default function Visualizer3DPage() {
 
         <Link
           href="/visualizer"
-          className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium !text-white transition hover:opacity-90"
         >
           <ArrowLeft size={16} /> Back
         </Link>
