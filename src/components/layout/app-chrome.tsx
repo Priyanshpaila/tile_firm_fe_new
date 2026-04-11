@@ -13,6 +13,7 @@ const APP_ROUTES_WITHOUT_SITE_CHROME = [
   "/admin",
   "/staff",
   "/user",
+  "/visualizer/3d",
 ];
 
 export function AppChrome({ children }: { children: ReactNode }) {
@@ -29,7 +30,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 min-h-0">{children}</main>
       <SiteFooter />
     </div>
   );

@@ -1,16 +1,22 @@
 import * as THREE from "three";
 import type { Group, Material, Mesh } from "three";
-import type { AppliedTiles, RoomConfig, SurfaceType } from "../types";
+import type {
+  AppliedTiles,
+  RoomConfig,
+  SurfaceMaterialSetting,
+  SurfaceMaterialSettings,
+  SurfaceType,
+} from "../types";
 
 type Args = {
   scene: Group;
   config: RoomConfig;
-  tileScale: number;
+  materialSettings: SurfaceMaterialSettings;
   appliedTiles: AppliedTiles;
 };
 
 const loader = new THREE.TextureLoader();
-const textureCache = new Map<string, THREE.Texture>();
+const baseTextureCache = new Map<string, THREE.Texture>();
 
 function normalize(value: string) {
   return value
@@ -54,14 +60,8 @@ function getSurface(mesh: Mesh, config: RoomConfig): SurfaceType | null {
   return null;
 }
 
-function getRepeat(surface: SurfaceType, config: RoomConfig, tileScale: number) {
-  const base = config.textureRepeat?.[surface] ?? 2;
-  return Math.max(0.25, base * tileScale);
-}
-
-function getTexture(url: string, repeat: number) {
-  const key = `${url}__${repeat}`;
-  let texture = textureCache.get(key);
+function getBaseTexture(url: string) {
+  let texture = baseTextureCache.get(url);
 
   if (!texture) {
     texture = loader.load(url);
@@ -70,10 +70,36 @@ function getTexture(url: string, repeat: number) {
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.flipY = false;
     texture.anisotropy = 16;
-    texture.repeat.set(repeat, repeat);
     texture.needsUpdate = true;
-    textureCache.set(key, texture);
+    baseTextureCache.set(url, texture);
   }
+
+  return texture;
+}
+
+function buildConfiguredTexture(
+  url: string,
+  surface: SurfaceType,
+  config: RoomConfig,
+  settings: SurfaceMaterialSetting,
+) {
+  const base = getBaseTexture(url);
+  const texture = base.clone();
+
+  const baseRepeat = config.textureRepeat?.[surface] ?? 2;
+  const finalRepeat = Math.max(0.15, baseRepeat * settings.scale);
+
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
+  texture.anisotropy = 16;
+
+  texture.repeat.set(finalRepeat, finalRepeat);
+  texture.offset.set(settings.offsetX, settings.offsetY);
+  texture.center.set(0.5, 0.5);
+  texture.rotation = THREE.MathUtils.degToRad(settings.rotation);
+  texture.needsUpdate = true;
 
   return texture;
 }
@@ -90,14 +116,6 @@ function cloneBaseMaterial(material: Material) {
 
   if (cloned.color) {
     cloned.color = new THREE.Color("#ffffff");
-  }
-
-  if (typeof cloned.roughness === "number") {
-    cloned.roughness = 0.9;
-  }
-
-  if (typeof cloned.metalness === "number") {
-    cloned.metalness = 0.04;
   }
 
   cloned.side = THREE.DoubleSide;
@@ -125,6 +143,7 @@ function restoreBaseMaterial(mesh: Mesh) {
 function applyTextureToMesh(
   mesh: Mesh,
   texture: THREE.Texture,
+  settings: SurfaceMaterialSetting,
 ) {
   const base = getStoredBaseMaterial(mesh);
 
@@ -132,10 +151,14 @@ function applyTextureToMesh(
     mesh.material = base.map((m) => {
       const next = cloneBaseMaterial(m) as THREE.Material & {
         map?: THREE.Texture | null;
+        roughness?: number;
+        metalness?: number;
         needsUpdate?: boolean;
       };
 
       next.map = texture;
+      if (typeof next.roughness === "number") next.roughness = settings.roughness;
+      if (typeof next.metalness === "number") next.metalness = settings.metalness;
       next.needsUpdate = true;
       return next;
     });
@@ -144,10 +167,14 @@ function applyTextureToMesh(
 
   const next = cloneBaseMaterial(base) as THREE.Material & {
     map?: THREE.Texture | null;
+    roughness?: number;
+    metalness?: number;
     needsUpdate?: boolean;
   };
 
   next.map = texture;
+  if (typeof next.roughness === "number") next.roughness = settings.roughness;
+  if (typeof next.metalness === "number") next.metalness = settings.metalness;
   next.needsUpdate = true;
   mesh.material = next;
 }
@@ -155,9 +182,11 @@ function applyTextureToMesh(
 export function applyMaterialToMeshes({
   scene,
   config,
-  tileScale,
+  materialSettings,
   appliedTiles,
 }: Args) {
+  const configuredTextures: Partial<Record<SurfaceType, THREE.Texture>> = {};
+
   scene.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
 
@@ -173,8 +202,17 @@ export function applyMaterialToMeshes({
       return;
     }
 
-    const repeat = getRepeat(surface, config, tileScale);
-    const texture = getTexture(textureUrl, repeat);
-    applyTextureToMesh(mesh, texture);
+    const settings = materialSettings[surface];
+
+    if (!configuredTextures[surface]) {
+      configuredTextures[surface] = buildConfiguredTexture(
+        textureUrl,
+        surface,
+        config,
+        settings,
+      );
+    }
+
+    applyTextureToMesh(mesh, configuredTextures[surface]!, settings);
   });
 }

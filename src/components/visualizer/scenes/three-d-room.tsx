@@ -5,11 +5,11 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { BaseRoomScene } from "../core/base-room-scene";
 import { ROOM_CONFIGS } from "../core/room-config";
-import type { AppliedTiles } from "../types";
+import type { AppliedTiles, SurfaceMaterialSettings } from "../types";
 
 type Props = {
   modelKey: keyof typeof ROOM_CONFIGS;
-  tileScale: number;
+  materialSettings: SurfaceMaterialSettings;
   appliedTiles: AppliedTiles;
 };
 
@@ -33,7 +33,7 @@ function CameraSetup({
 
 export default function ThreeDRoom({
   modelKey,
-  tileScale,
+  materialSettings,
   appliedTiles,
 }: Props) {
   const config = ROOM_CONFIGS[modelKey];
@@ -70,7 +70,7 @@ export default function ThreeDRoom({
         <BaseRoomScene
           modelUrl={config.modelUrl}
           config={config}
-          tileScale={tileScale}
+          materialSettings={materialSettings}
           appliedTiles={appliedTiles}
         />
       </Suspense>

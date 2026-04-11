@@ -11,7 +11,13 @@ import { useVisualizerCatalog } from "@/components/visualizer/hooks/use-visualiz
 import { getProductPreview } from "@/components/visualizer/utils";
 import type {
   AppliedTiles,
+  SurfaceMaterialSetting,
+  SurfaceMaterialSettings,
   SurfaceType,
+} from "@/components/visualizer/types";
+import {
+  createDefaultSurfaceMaterialSetting,
+  createDefaultSurfaceMaterialSettings,
 } from "@/components/visualizer/types";
 
 const SURFACES: SurfaceType[] = ["floor", "wall", "ceiling"];
@@ -26,8 +32,10 @@ export default function VisualizerPage() {
     setSelectedSurface,
   } = useVisualizerCatalog();
 
-  const [tileScale, setTileScale] = useState(1);
   const [appliedTiles, setAppliedTiles] = useState<AppliedTiles>({});
+  const [materialSettings, setMaterialSettings] = useState<SurfaceMaterialSettings>(
+    createDefaultSurfaceMaterialSettings(),
+  );
 
   const handleSelect = (id: string) => {
     const product = products.find((item) => item._id === id);
@@ -43,8 +51,25 @@ export default function VisualizerPage() {
     }));
   };
 
+  const handleMaterialChange = (patch: Partial<SurfaceMaterialSetting>) => {
+    setMaterialSettings((prev) => ({
+      ...prev,
+      [selectedSurface]: {
+        ...prev[selectedSurface],
+        ...patch,
+      },
+    }));
+  };
+
+  const handleResetMaterial = () => {
+    setMaterialSettings((prev) => ({
+      ...prev,
+      [selectedSurface]: createDefaultSurfaceMaterialSetting(),
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-[#f6f3ee] text-neutral-900">
+    <div className="h-auto overflow-hidden bg-[#f6f3ee] text-neutral-900">
       <header className="flex items-center justify-between px-4 pb-4 pt-4 md:px-6 md:pb-5 md:pt-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
@@ -57,7 +82,7 @@ export default function VisualizerPage() {
 
         <Link
           href="/visualizer/3d"
-          className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium !text-white transition hover:opacity-90"
         >
           Go 3D <ArrowRight size={16} />
         </Link>
@@ -96,8 +121,10 @@ export default function VisualizerPage() {
           </div>
 
           <VisualizerMaterialControls
-            tileScale={tileScale}
-            onTileScaleChange={setTileScale}
+            selectedSurface={selectedSurface}
+            settings={materialSettings[selectedSurface]}
+            onChange={handleMaterialChange}
+            onReset={handleResetMaterial}
           />
         </aside>
 
@@ -105,7 +132,7 @@ export default function VisualizerPage() {
           <div className="h-[58vh] min-h-[420px] overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_top,#f7f3ec_0%,#eee7dc_45%,#e7ded0_100%)] sm:h-[62vh] lg:h-[76vh]">
             <TwoDRoom
               modelKey="cozy_living"
-              tileScale={tileScale}
+              materialSettings={materialSettings}
               appliedTiles={appliedTiles}
             />
           </div>

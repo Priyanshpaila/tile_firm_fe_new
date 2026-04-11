@@ -5,12 +5,16 @@ import { useGLTF } from "@react-three/drei";
 import { Box3, Group, Mesh, Vector3 } from "three";
 import type { GLTF } from "three-stdlib";
 import { applyMaterialToMeshes } from "./material-applier";
-import type { AppliedTiles, RoomConfig } from "../types";
+import type {
+  AppliedTiles,
+  RoomConfig,
+  SurfaceMaterialSettings,
+} from "../types";
 
 type Props = {
   modelUrl: string;
   config: RoomConfig;
-  tileScale: number;
+  materialSettings: SurfaceMaterialSettings;
   appliedTiles: AppliedTiles;
 };
 
@@ -19,7 +23,7 @@ type GLTFResult = GLTF & { scene: Group };
 export function BaseRoomScene({
   modelUrl,
   config,
-  tileScale,
+  materialSettings,
   appliedTiles,
 }: Props) {
   const { scene } = useGLTF(modelUrl) as GLTFResult;
@@ -61,10 +65,10 @@ export function BaseRoomScene({
     applyMaterialToMeshes({
       scene: clonedScene,
       config,
-      tileScale,
+      materialSettings,
       appliedTiles,
     });
-  }, [clonedScene, config, tileScale, appliedTiles]);
+  }, [clonedScene, config, materialSettings, appliedTiles]);
 
   return <primitive object={clonedScene} />;
 }

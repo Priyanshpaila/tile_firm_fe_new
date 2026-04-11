@@ -2,24 +2,18 @@ import type { RoomConfig } from "../types";
 
 export const ROOM_CONFIGS: Record<string, RoomConfig> = {
   cozy_living: {
-    modelUrl: "/models/cozy_living_room_baked.glb",
+    modelUrl: "/models/shapespark_example_room.glb",
 
     floorMeshes: [
-      "cube.019",
-      "birch wood flooring english",
+      "Floor",
     ],
 
     wallMeshes: [
-      "plane material 021",
-      "plane.001 material.011",
-      "plane.001 material.013",
+      "Wall",
     ],
 
     ceilingMeshes: [
-      "cube.007 material.023",
-      "cube.014 material.023",
-      "cube.038 material.023",
-      "cube.008",
+     "Ceiling",
     ],
 
     modelScale: 1,
@@ -28,8 +22,8 @@ export const ROOM_CONFIGS: Record<string, RoomConfig> = {
 
 
     twoDCamera: {
-      position: [2.04, 2.35, 4.15],
-      fov: 46,
+      position: [.08, 1.2, 1.3],
+      fov: 49,
     },
 
     threeDCamera: {
